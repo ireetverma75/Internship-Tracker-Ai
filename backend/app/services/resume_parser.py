@@ -1,107 +1,159 @@
-"""Resume PDF text extraction service using PyMuPDF."""
+"""
+Resume PDF parser using PyMuPDF.
+Extracts text and infers structured profile using regex and heuristics.
+Does NOT invent missing information.
+"""
 import re
-from typing import List, Tuple
 import fitz  # PyMuPDF
-from fastapi import HTTPException, UploadFile, status
-from app.core.config import settings
-from app.schemas.resume import ResumeParseResponse
-from app.services.job_analyzer import COMMON_SKILLS
+from typing import BinaryIO
+from app.schemas.profile import ExtractedProfile
 
+SKILL_KEYWORDS = [
+    "python", "javascript", "typescript", "java", "c++", "c#", "go", "rust", "swift",
+    "kotlin", "r", "matlab", "scala", "ruby", "php", "sql", "nosql",
+    "react", "nextjs", "next.js", "angular", "vue", "svelte", "node.js", "express",
+    "django", "fastapi", "flask", "spring", "rails", "laravel",
+    "tensorflow", "pytorch", "keras", "scikit-learn", "pandas", "numpy", "matplotlib",
+    "docker", "kubernetes", "aws", "azure", "gcp", "git", "linux", "bash",
+    "mongodb", "postgresql", "mysql", "redis", "elasticsearch", "graphql",
+    "machine learning", "deep learning", "nlp", "computer vision", "data science",
+    "html", "css", "tailwind", "sass", "figma", "rest api", "microservices",
+]
 
-class ResumeParserService:
-    def __init__(self):
-        self.max_size = settings.MAX_RESUME_SIZE_MB * 1024 * 1024
+DEGREE_PATTERNS = [
+    r"\b(B\.?Tech|B\.?E\.?|Bachelor of Technology|Bachelor of Engineering)\b",
+    r"\b(M\.?Tech|M\.?E\.?|Master of Technology|Master of Engineering)\b",
+    r"\b(B\.?Sc|Bachelor of Science)\b",
+    r"\b(M\.?Sc|Master of Science)\b",
+    r"\b(BCA|MCA|MBA|B\.?Com|M\.?Com|Ph\.?D)\b",
+]
 
-    async def parse_pdf(self, file: UploadFile) -> ResumeParseResponse:
-        # 1. Validate content type and filename
-        if not file.filename.lower().endswith(".pdf"):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Only PDF documents are supported. Please upload a .pdf file."
-            )
+GRAD_YEAR_PATTERN = r"\b(20\d{2})\b"
+CERT_KEYWORDS = ["certified", "certification", "certificate", "aws certified", "google certified", "coursera", "udemy"]
 
-        # 2. Read bytes with size limit check
-        contents = await file.read()
-        if len(contents) == 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Uploaded file is empty (0 bytes)."
-            )
-        if len(contents) > self.max_size:
-            raise HTTPException(
-                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                detail=f"File exceeds maximum allowed size of {settings.MAX_RESUME_SIZE_MB}MB."
-            )
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
 
-        # 3. Open with PyMuPDF
-        try:
-            doc = fitz.open(stream=contents, filetype="pdf")
-        except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Unable to open document as a valid PDF. File may be corrupted."
-            )
+class ResumeParseError(Exception):
+    def __init__(self, code: str, message: str):
+        self.code = code
+        self.message = message
+        super().__init__(message)
 
-        # 4. Check encryption
-        if doc.is_encrypted:
-            return ResumeParseResponse(
-                filename=file.filename,
-                page_count=len(doc),
-                char_count=0,
-                word_count=0,
-                extracted_text="",
-                detected_skills=[],
-                is_encrypted=True,
-                warning="PDF is password-protected or encrypted. Please remove password protection and try again."
-            )
+def validate_and_extract_text(file_bytes: bytes, filename: str) -> str:
+    """Validate PDF and extract raw text. Raises ResumeParseError on failure."""
+    if not filename.lower().endswith(".pdf"):
+        raise ResumeParseError("INVALID_FILE_TYPE", "Only PDF files are accepted.")
+    if len(file_bytes) > MAX_FILE_SIZE:
+        raise ResumeParseError("FILE_TOO_LARGE", "File exceeds 5 MB limit.")
+    if len(file_bytes) < 100:
+        raise ResumeParseError("EMPTY_PDF", "The uploaded file appears to be empty.")
 
-        page_count = len(doc)
-        full_text_parts: List[str] = []
+    try:
+        doc = fitz.open(stream=file_bytes, filetype="pdf")
+    except Exception:
+        raise ResumeParseError("INVALID_FILE_TYPE", "Could not open the file as a PDF.")
 
-        for page_num in range(page_count):
-            page = doc.load_page(page_num)
-            text = page.get_text()
-            if text:
-                full_text_parts.append(text)
+    if doc.needs_pass:
+        raise ResumeParseError("ENCRYPTED_PDF", "This PDF is password-protected. Please remove the password and re-upload.")
 
-        doc.close()
+    text = ""
+    for page in doc:
+        text += page.get_text()
 
-        extracted_text = "\n".join(full_text_parts).strip()
-        char_count = len(extracted_text)
-        words = extracted_text.split()
-        word_count = len(words)
+    doc.close()
 
-        warning = None
-        if char_count == 0:
-            warning = (
-                "Scanned image-only PDF detected. PyMuPDF extracts embedded digital text; "
-                "optical character recognition (OCR) is not enabled on this server."
-            )
-
-        # Detect skills from resume text
-        detected_skills = self._extract_skills(extracted_text)
-
-        return ResumeParseResponse(
-            filename=file.filename,
-            page_count=page_count,
-            char_count=char_count,
-            word_count=word_count,
-            extracted_text=extracted_text,
-            detected_skills=detected_skills,
-            is_encrypted=False,
-            warning=warning
+    if len(text.strip()) < 100:
+        raise ResumeParseError(
+            "SCANNED_PDF",
+            "This PDF appears to be a scanned image. OCR is not supported. "
+            "Please upload a text-based PDF resume."
         )
 
-    def _extract_skills(self, text: str) -> List[str]:
-        if not text:
-            return []
-        text_lower = text.lower()
-        found = []
-        for skill in COMMON_SKILLS:
-            pattern = rf"(?<![\w#+]){re.escape(skill.lower())}(?![\w#+])"
-            if re.search(pattern, text_lower):
-                found.append(skill)
-        return sorted(list(set(found)))
+    return text
 
+def parse_resume(file_bytes: bytes, filename: str) -> ExtractedProfile:
+    """Main entry point. Returns extracted profile or raises ResumeParseError."""
+    text = validate_and_extract_text(file_bytes, filename)
+    return _extract_profile(text)
 
-resume_parser = ResumeParserService()
+def _extract_profile(text: str) -> ExtractedProfile:
+    text_lower = text.lower()
+
+    # Skills
+    found_skills = []
+    for skill in SKILL_KEYWORDS:
+        if skill in text_lower:
+            found_skills.append(skill.title())
+
+    # Deduplicate programming languages vs frameworks
+    PROG_LANGS = {"Python", "Javascript", "Typescript", "Java", "C++", "C#", "Go",
+                  "Rust", "Swift", "Kotlin", "R", "Matlab", "Scala", "Ruby", "Php",
+                  "Sql", "Nosql", "Html", "Css"}
+    prog_langs = [s for s in found_skills if s in PROG_LANGS]
+    frameworks = [s for s in found_skills if s not in PROG_LANGS]
+
+    # Degree
+    degree = None
+    for pattern in DEGREE_PATTERNS:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            degree = match.group(0).strip()
+            break
+
+    # Graduation year — take the latest year found
+    years = re.findall(GRAD_YEAR_PATTERN, text)
+    grad_year = max(int(y) for y in years) if years else None
+    if grad_year and grad_year > 2035:
+        grad_year = None
+
+    # Certifications
+    certs = []
+    for line in text.split("\n"):
+        if any(kw in line.lower() for kw in CERT_KEYWORDS):
+            cleaned = line.strip()
+            if cleaned and len(cleaned) < 200:
+                certs.append(cleaned)
+    certs = list(dict.fromkeys(certs))[:5]
+
+    # Projects — look for project title patterns
+    project_pattern = re.findall(r"(?:project|built|developed|created)[:\s]+([A-Z][a-zA-Z\s]{5,50})", text)
+    projects = list(dict.fromkeys(p.strip() for p in project_pattern))[:5]
+
+    # Specialization heuristic
+    spec = None
+    spec_keywords = {
+        "computer science": "Computer Science",
+        "artificial intelligence": "Artificial Intelligence",
+        "machine learning": "Machine Learning",
+        "data science": "Data Science",
+        "information technology": "Information Technology",
+        "electronics": "Electronics",
+        "electrical": "Electrical Engineering",
+        "mechanical": "Mechanical Engineering",
+        "civil": "Civil Engineering",
+    }
+    for kw, label in spec_keywords.items():
+        if kw in text_lower:
+            spec = label
+            break
+
+    # Career interests from objective/summary section
+    interests = ""
+    for section_kw in ["objective", "summary", "career goal", "about me"]:
+        idx = text_lower.find(section_kw)
+        if idx != -1:
+            snippet = text[idx:idx+300].strip()
+            interests = " ".join(snippet.split()[:30])
+            break
+
+    return ExtractedProfile(
+        skills=list(dict.fromkeys(found_skills))[:20],
+        programming_languages=prog_langs,
+        frameworks=frameworks,
+        certifications=certs,
+        project_titles=projects,
+        career_interests=interests,
+        degree=degree,
+        specialization=spec,
+        graduation_year=grad_year,
+    )

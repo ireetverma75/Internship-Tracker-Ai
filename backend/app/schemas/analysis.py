@@ -1,26 +1,27 @@
-"""Pydantic schemas for AI Job Description Analyzer."""
-from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from typing import Optional
 
+class AnalysisRequest(BaseModel):
+    text: str
 
-class JobAnalysisRequest(BaseModel):
-    description: str = Field(..., min_length=10, description="Raw job description text")
-    job_url: Optional[str] = Field(None, description="Optional original job posting URL")
-
-
-class JobAnalysisResponse(BaseModel):
-    role: str
+class AnalysisExtracted(BaseModel):
+    title: Optional[str] = None
     company: Optional[str] = None
-    experience_requirement: Optional[str] = "Not specified"
-    eligibility_criteria: Optional[str] = "Not specified"
-    required_skills: List[str] = Field(default_factory=list)
-    preferred_skills: List[str] = Field(default_factory=list)
-    responsibilities: List[str] = Field(default_factory=list)
-    location: Optional[str] = "Not specified"
-    work_mode: Optional[str] = "Not specified"  # Remote, Hybrid, On-site, Not specified
-    stipend_or_salary: Optional[str] = "Not specified"
-    application_deadline: Optional[str] = "Not specified"
-    important_qualifications: List[str] = Field(default_factory=list)
-    summary: str
-    is_demo: bool = False
-    model_used: str = "deterministic-fallback-v1"
+    required_skills: list[str] = []
+    preferred_skills: list[str] = []
+    responsibilities: list[str] = []
+    eligibility: Optional[str] = None
+    location: Optional[str] = None
+    work_mode: Optional[str] = None
+    compensation: Optional[str] = None
+    deadline: Optional[str] = None
+
+class MatchPreview(BaseModel):
+    score: float
+    matched_skills: list[str] = []
+    missing_skills: list[str] = []
+
+class AnalysisResponse(BaseModel):
+    is_demo: bool
+    extracted: AnalysisExtracted
+    match_preview: MatchPreview

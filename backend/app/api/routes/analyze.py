@@ -1,54 +1,89 @@
-"""AI Job Description Analyzer endpoint."""
-from urllib.parse import urlparse
-import ipaddress
-from fastapi import APIRouter, HTTPException, status
-from app.schemas.analysis import JobAnalysisRequest, JobAnalysisResponse
-from app.services.job_analyzer import job_analyzer
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from typing import Optional
+from pydantic import BaseModel
 
-router = APIRouter(tags=["AI Job Analyzer"])
+from app.db.database import get_db
+from app.db.models import Profile
+from app.core.auth import get_current_user
+from app.services.ai_analyzer import analyze_job_description
+from app.services.matching import compute_match
 
+router = APIRouter(tags=["Analysis"])
 
-def validate_safe_url(url: str):
-    """Prevent SSRF attacks by rejecting local, private, or loopback IPs."""
-    parsed = urlparse(url)
-    if parsed.scheme not in ("http", "https"):
+class JobAnalyzeRequest(BaseModel):
+    description: Optional[str] = None
+    text: Optional[str] = None
+    job_url: Optional[str] = None
+
+@router.post("/api/analyze-job")
+@router.post("/api/analyze/job-description")
+async def analyze_job(
+    payload: JobAnalyzeRequest,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Analyze a pasted job description using AI (or fallback demo analyzer)."""
+    raw_text = payload.description or payload.text
+    if not raw_text or len(raw_text.strip()) < 10:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid URL scheme. Only HTTP and HTTPS are permitted."
-        )
-    hostname = parsed.hostname
-    if not hostname:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid job URL."
-        )
-    if hostname.lower() in ("localhost", "127.0.0.1", "0.0.0.0", "::1"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Private/internal hostnames are prohibited."
-        )
-    try:
-        ip = ipaddress.ip_address(hostname)
-        if ip.is_private or ip.is_loopback or ip.is_link_local:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Private network addresses are prohibited."
-            )
-    except ValueError:
-        # Hostname is a domain name, which is allowed
-        pass
-
-
-@router.post("/analyze-job", response_model=JobAnalysisResponse)
-async def analyze_job(payload: JobAnalysisRequest):
-    if payload.job_url:
-        validate_safe_url(payload.job_url)
-
-    if len(payload.description.strip()) < 10:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Job description text is too short. Please provide at least 10 characters."
+            detail="Job description text is too short or empty."
         )
 
-    result = await job_analyzer.analyze(payload)
-    return result
+    extracted, is_demo = await analyze_job_description(raw_text)
+
+    # Get user profile for match preview
+    p_stmt = select(Profile).where(Profile.user_id == user_id)
+    p_res = await db.execute(p_stmt)
+    profile = p_res.scalar_one_or_none()
+    profile_dict = profile.__dict__ if profile else {}
+
+    match = compute_match(
+        profile=profile_dict,
+        internship_required=extracted.required_skills,
+        internship_preferred=extracted.preferred_skills,
+        internship_location=extracted.location,
+        internship_work_mode=extracted.work_mode or "any",
+        degree_req=extracted.eligibility
+    )
+
+    all_tech = list(dict.fromkeys(extracted.required_skills + extracted.preferred_skills))
+
+    return {
+        "role": extracted.title or "Software Engineering Intern",
+        "title": extracted.title or "Software Engineering Intern",
+        "company": extracted.company or "[Demo Company]",
+        "experience_requirement": "Entry Level / College Student",
+        "eligibility_criteria": extracted.eligibility or "Enrolled in B.Tech, B.E., or related degree",
+        "required_skills": extracted.required_skills,
+        "preferred_skills": extracted.preferred_skills,
+        "responsibilities": extracted.responsibilities or [
+            "Contribute to software design and architecture",
+            "Write robust unit tests and documentation",
+            "Collaborate with engineering teams"
+        ],
+        "location": extracted.location or "Bangalore, India",
+        "work_mode": extracted.work_mode or "Hybrid",
+        "stipend_or_salary": extracted.compensation or "₹30,000 – ₹50,000/month",
+        "application_deadline": extracted.deadline,
+        "important_qualifications": [
+            "Strong grasp of data structures and algorithms",
+            "Familiarity with Git and collaborative version control"
+        ],
+        "key_technologies": all_tech if all_tech else ["Python", "SQL", "Git"],
+        "interview_prep_tips": [
+            "Review core data structure problems on LeetCode / GeeksforGeeks",
+            "Be ready to explain architectural choices made in your project portfolio",
+            "Practice explaining time/space complexities clearly"
+        ],
+        "role_summary": f"Exciting opportunity at {extracted.company or 'leading tech team'} focused on scalable engineering and modern tech stacks.",
+        "is_demo": is_demo,
+        "extracted": extracted.model_dump(),
+        "match_preview": {
+            "score": int(match.score),
+            "matched_skills": match.matched_skills,
+            "missing_skills": match.missing_skills
+        }
+    }

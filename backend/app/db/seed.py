@@ -1,225 +1,179 @@
-"""Database seeding for realistic demo opportunities and applications."""
-from datetime import date, datetime, timedelta
-from sqlalchemy.orm import Session
-from app.db.models import InternshipModel, ApplicationModel
+"""
+Demo seed data. All entries have is_demo=True and are clearly labeled.
+Uses INSERT OR IGNORE for idempotency.
+"""
+from datetime import date, timedelta
+from app.db.models import Internship
+from app.db.database import AsyncSessionLocal
+import uuid
 
+DEMO_INTERNSHIPS = [
+    {
+        "company": "[Demo] Google",
+        "title": "Software Engineering Intern",
+        "description": "Work on large-scale distributed systems and backend services. You will collaborate with engineers to design and implement features impacting millions of users.",
+        "required_skills": ["Python", "Go", "Distributed Systems", "SQL"],
+        "preferred_skills": ["Kubernetes", "Protobuf", "Machine Learning"],
+        "degree_requirement": "B.Tech/B.E. or equivalent",
+        "experience_level": "entry",
+        "location": "Bangalore, India",
+        "work_mode": "hybrid",
+        "stipend_min": 80000, "stipend_max": 120000, "currency": "INR",
+        "official_url": "https://careers.google.com/",
+        "deadline": date.today() + timedelta(days=45),
+        "source": "demo", "is_demo": True,
+    },
+    {
+        "company": "[Demo] Microsoft",
+        "title": "Data Science Intern",
+        "description": "Analyze large datasets to derive insights for Azure cloud products. Build dashboards and ML models to support product decisions.",
+        "required_skills": ["Python", "SQL", "Machine Learning", "Pandas", "Numpy"],
+        "preferred_skills": ["Azure", "Spark", "Scikit-Learn"],
+        "degree_requirement": "B.Tech CS/ECE or M.Tech",
+        "experience_level": "entry",
+        "location": "Hyderabad, India",
+        "work_mode": "hybrid",
+        "stipend_min": 70000, "stipend_max": 100000, "currency": "INR",
+        "official_url": "https://careers.microsoft.com/",
+        "deadline": date.today() + timedelta(days=30),
+        "source": "demo", "is_demo": True,
+    },
+    {
+        "company": "[Demo] Flipkart",
+        "title": "Frontend Engineering Intern",
+        "description": "Build and optimize React-based UI components for Flipkart's e-commerce platform serving 350M+ users.",
+        "required_skills": ["React", "Javascript", "Typescript", "CSS", "HTML"],
+        "preferred_skills": ["Redux", "GraphQL", "Webpack"],
+        "degree_requirement": "B.Tech IT/CS",
+        "experience_level": "entry",
+        "location": "Bangalore, India",
+        "work_mode": "onsite",
+        "stipend_min": 40000, "stipend_max": 60000, "currency": "INR",
+        "official_url": "https://www.flipkartcareers.com/",
+        "deadline": date.today() + timedelta(days=20),
+        "source": "demo", "is_demo": True,
+    },
+    {
+        "company": "[Demo] Razorpay",
+        "title": "Backend Engineering Intern",
+        "description": "Develop microservices for Razorpay's payment gateway. Work with high-throughput systems processing millions of transactions.",
+        "required_skills": ["Python", "Go", "SQL", "Docker", "REST API"],
+        "preferred_skills": ["Kafka", "Redis", "Kubernetes"],
+        "degree_requirement": "B.Tech CS/ECE",
+        "experience_level": "entry",
+        "location": "Bangalore, India",
+        "work_mode": "hybrid",
+        "stipend_min": 50000, "stipend_max": 75000, "currency": "INR",
+        "official_url": "https://razorpay.com/jobs/",
+        "deadline": date.today() + timedelta(days=35),
+        "source": "demo", "is_demo": True,
+    },
+    {
+        "company": "[Demo] Zerodha",
+        "title": "ML Engineering Intern",
+        "description": "Build machine learning models for fraud detection and trading signal generation. Work closely with quant team.",
+        "required_skills": ["Python", "Machine Learning", "Scikit-Learn", "SQL", "Pandas"],
+        "preferred_skills": ["Deep Learning", "Pytorch", "Airflow"],
+        "degree_requirement": "B.Tech CS / M.Sc Statistics",
+        "experience_level": "entry",
+        "location": "Remote",
+        "work_mode": "remote",
+        "stipend_min": 35000, "stipend_max": 55000, "currency": "INR",
+        "official_url": "https://zerodha.com/careers/",
+        "deadline": date.today() + timedelta(days=60),
+        "source": "demo", "is_demo": True,
+    },
+    {
+        "company": "[Demo] Swiggy",
+        "title": "Product Intern",
+        "description": "Define and execute product roadmap features for Swiggy Instamart. Work with design and engineering on rapid 0-to-1 features.",
+        "required_skills": ["SQL", "Product Thinking", "Data Analysis"],
+        "preferred_skills": ["Python", "Figma", "A/B Testing"],
+        "degree_requirement": "Any engineering degree",
+        "experience_level": "entry",
+        "location": "Bangalore, India",
+        "work_mode": "onsite",
+        "stipend_min": 30000, "stipend_max": 50000, "currency": "INR",
+        "official_url": "https://careers.swiggy.com/",
+        "deadline": date.today() + timedelta(days=25),
+        "source": "demo", "is_demo": True,
+    },
+    {
+        "company": "[Demo] CRED",
+        "title": "iOS Engineering Intern",
+        "description": "Develop premium iOS features for CRED app used by 10M+ high-credit-score customers.",
+        "required_skills": ["Swift", "iOS", "Xcode", "REST API"],
+        "preferred_skills": ["Kotlin", "SwiftUI", "Core Data"],
+        "degree_requirement": "B.Tech CS/IT",
+        "experience_level": "entry",
+        "location": "Bangalore, India",
+        "work_mode": "onsite",
+        "stipend_min": 50000, "stipend_max": 80000, "currency": "INR",
+        "official_url": "https://careers.cred.club/",
+        "deadline": date.today() + timedelta(days=15),
+        "source": "demo", "is_demo": True,
+    },
+    {
+        "company": "[Demo] Meesho",
+        "title": "DevOps Intern",
+        "description": "Build and maintain CI/CD pipelines, container orchestration, and cloud infrastructure for Meesho's social commerce platform.",
+        "required_skills": ["Docker", "Kubernetes", "Linux", "Bash", "AWS"],
+        "preferred_skills": ["Terraform", "Ansible", "Jenkins"],
+        "degree_requirement": "B.Tech CS/ECE",
+        "experience_level": "entry",
+        "location": "Bangalore, India",
+        "work_mode": "hybrid",
+        "stipend_min": 30000, "stipend_max": 50000, "currency": "INR",
+        "official_url": "https://careers.meesho.com/",
+        "deadline": date.today() + timedelta(days=50),
+        "source": "demo", "is_demo": True,
+    },
+    {
+        "company": "[Demo] Ola",
+        "title": "Android Engineering Intern",
+        "description": "Build rider and driver-facing Android features for Ola mobility app serving 250 cities.",
+        "required_skills": ["Kotlin", "Android", "Java", "REST API"],
+        "preferred_skills": ["Jetpack Compose", "Firebase", "MVVM"],
+        "degree_requirement": "B.Tech CS/IT",
+        "experience_level": "entry",
+        "location": "Bangalore, India",
+        "work_mode": "hybrid",
+        "stipend_min": 35000, "stipend_max": 55000, "currency": "INR",
+        "official_url": "https://www.olacabs.com/careers",
+        "deadline": date.today() + timedelta(days=40),
+        "source": "demo", "is_demo": True,
+    },
+    {
+        "company": "[Demo] Groww",
+        "title": "Data Analytics Intern",
+        "description": "Analyze user investment patterns, build funnels, and create dashboards to drive product decisions for India's largest investment platform.",
+        "required_skills": ["SQL", "Python", "Data Analysis", "Pandas", "Matplotlib"],
+        "preferred_skills": ["Tableau", "Power BI", "Spark"],
+        "degree_requirement": "B.Tech / B.Sc Statistics / Economics",
+        "experience_level": "entry",
+        "location": "Bangalore, India",
+        "work_mode": "hybrid",
+        "stipend_min": 30000, "stipend_max": 45000, "currency": "INR",
+        "official_url": "https://groww.in/p/careers",
+        "deadline": date.today() + timedelta(days=22),
+        "source": "demo", "is_demo": True,
+    },
+]
 
-def seed_demo_data(db: Session):
-    """Seed initial fictional opportunities if database table is empty."""
-    count = db.query(InternshipModel).count()
-    if count > 0:
-        return
-
-    today = date.today()
-
-    internships = [
-        InternshipModel(
-            id="seed-msft-swe",
-            company="Microsoft",
-            role="Software Engineering Intern — Cloud & AI Platform",
-            description=(
-                "Join Microsoft's Core Services Engineering and Azure platform team. "
-                "You will build high-throughput microservices, design scalable APIs, and implement machine-learning deployment pipelines."
-            ),
-            location="Redmond, WA / Remote Option",
-            work_mode="Hybrid",
-            stipend="$52/hr (~$8,300/mo) + Relocation Housing",
-            deadline=today + timedelta(days=24),
-            job_url="https://careers.microsoft.com/students",
-            required_skills=["Python", "C++", "Distributed Systems", "Azure", "Docker"],
-            preferred_skills=["Kubernetes", "Linux", "System Design"],
-            eligibility="Pursuing Bachelor's or Master's in Computer Science or related STEM field graduating in 2026 or 2027.",
-            notes="Requires 1 online coding assessment followed by 3 technical video rounds.",
-            is_demo=True,
-            is_saved=True
-        ),
-        InternshipModel(
-            id="seed-nvda-dl",
-            company="NVIDIA",
-            role="Deep Learning Research Intern",
-            description=(
-                "Collaborate with world-class AI researchers to accelerate deep learning training and inference on GPU architectures. "
-                "Work on state-of-the-art transformer optimization and model distillation."
-            ),
-            location="Santa Clara, CA",
-            work_mode="On-site",
-            stipend="$58/hr (~$9,280/mo) + Housing Subsidy",
-            deadline=today + timedelta(days=12),
-            job_url="https://nvidia.com/careers/university",
-            required_skills=["Python", "PyTorch", "C++", "Deep Learning", "CUDA"],
-            preferred_skills=["TensorFlow", "Algorithms", "Computer Vision"],
-            eligibility="Enrolled in MS or PhD program in Computer Science, AI, or Computer Engineering.",
-            notes="Emphasis on PyTorch internals and high-performance computing.",
-            is_demo=True,
-            is_saved=True
-        ),
-        InternshipModel(
-            id="seed-stripe-fe",
-            company="Stripe",
-            role="Frontend Engineering Intern — Developer Experience",
-            description=(
-                "Help build the financial infrastructure of the internet. Create intuitive, responsive, and resilient user interfaces "
-                "for developers and businesses around the globe using React, TypeScript, and modern design systems."
-            ),
-            location="San Francisco, CA / Distributed",
-            work_mode="Remote",
-            stipend="$55/hr (~$8,800/mo) + Equipment Stipend",
-            deadline=today + timedelta(days=32),
-            job_url="https://stripe.com/jobs/university",
-            required_skills=["TypeScript", "React", "Next.js", "CSS3", "REST APIs"],
-            preferred_skills=["GraphQL", "Tailwind CSS", "Testing Library"],
-            eligibility="Undergraduate or graduate student graduating within 18 months.",
-            notes="Strong focus on web accessibility, typography, and frontend performance.",
-            is_demo=True,
-            is_saved=False
-        ),
-        InternshipModel(
-            id="seed-atlassian-fs",
-            company="Atlassian",
-            role="Full Stack Engineer Intern — Jira & Confluence",
-            description=(
-                "Build cloud collaboration tools used by millions of teams worldwide. Work across the frontend and backend stack "
-                "delivering secure, scalable cloud microservices."
-            ),
-            location="Austin, TX",
-            work_mode="Remote",
-            stipend="$48/hr (~$7,680/mo)",
-            deadline=today + timedelta(days=45),
-            job_url="https://atlassian.com/company/careers/graduates",
-            required_skills=["Java", "TypeScript", "React", "AWS", "SQL"],
-            preferred_skills=["Docker", "Node.js", "Agile"],
-            eligibility="Current undergraduate or graduate student in Computer Science or related degree.",
-            notes="Company operates on Team Anywhere policy.",
-            is_demo=True,
-            is_saved=False
-        ),
-        InternshipModel(
-            id="seed-figma-ds",
-            company="Figma",
-            role="Design Systems & Core UI Intern",
-            description=(
-                "Bridge the boundary between design and code. Develop cutting-edge interactive canvas tools and design token infrastructure "
-                "powering Figma's flagship browser-based design software."
-            ),
-            location="New York, NY",
-            work_mode="Hybrid",
-            stipend="$50/hr (~$8,000/mo)",
-            deadline=today + timedelta(days=18),
-            job_url="https://figma.com/careers",
-            required_skills=["TypeScript", "React", "Figma", "HTML5", "CSS3"],
-            preferred_skills=["WebAssembly", "C++", "WebGL"],
-            eligibility="Enrolled in an accredited college degree program graduating in 2026 or 2027.",
-            notes="Portfolio or live web project links are highly encouraged.",
-            is_demo=True,
-            is_saved=True
-        ),
-        InternshipModel(
-            id="seed-deepmind-ai",
-            company="Google DeepMind",
-            role="AI Research Engineering Intern",
-            description=(
-                "Work on frontier foundation models and reinforcement learning algorithms alongside research scientists. "
-                "Design distributed experiment benchmarks and analyze model capabilities."
-            ),
-            location="London, UK / Remote Option",
-            work_mode="Hybrid",
-            stipend="£38/hr (~£6,000/mo) + Relocation Allowance",
-            deadline=today + timedelta(days=38),
-            job_url="https://deepmind.google/careers",
-            required_skills=["Python", "PyTorch", "Machine Learning", "Algorithms", "NLP"],
-            preferred_skills=["JAX", "Distributed Systems", "Data Structures"],
-            eligibility="Master's or PhD candidates specializing in machine learning, mathematics, or statistics.",
-            notes="Review published papers on arXiv as preparation.",
-            is_demo=True,
-            is_saved=False
-        ),
-    ]
-
-    for item in internships:
-        db.add(item)
-    db.flush()
-
-    # Seed Applications corresponding to internships
-    applications = [
-        ApplicationModel(
-            id="seed-app-msft",
-            internship_id="seed-msft-swe",
-            company="Microsoft",
-            role="Software Engineering Intern — Cloud & AI Platform",
-            status="Interview",
-            applied_date=today - timedelta(days=14),
-            interview_date=today + timedelta(days=4),
-            deadline=today + timedelta(days=24),
-            match_score=92,
-            next_action="Prepare System Design & Azure architectural round",
-            notes="Completed OA with 100% test cases passed. 2 technical rounds scheduled on Teams.",
-            job_url="https://careers.microsoft.com/students"
-        ),
-        ApplicationModel(
-            id="seed-app-nvda",
-            internship_id="seed-nvda-dl",
-            company="NVIDIA",
-            role="Deep Learning Research Intern",
-            status="Assessment",
-            applied_date=today - timedelta(days=7),
-            deadline=today + timedelta(days=12),
-            match_score=86,
-            next_action="Complete HackerRank coding test before Oct 25",
-            notes="Assessment link received. Requires deep C++ memory management and PyTorch implementations.",
-            job_url="https://nvidia.com/careers/university"
-        ),
-        ApplicationModel(
-            id="seed-app-stripe",
-            internship_id="seed-stripe-fe",
-            company="Stripe",
-            role="Frontend Engineering Intern — Developer Experience",
-            status="Applied",
-            applied_date=today - timedelta(days=3),
-            deadline=today + timedelta(days=32),
-            match_score=88,
-            next_action="Awaiting recruiter application review",
-            notes="Submitted with tailored resume emphasizing React performance optimizations.",
-            job_url="https://stripe.com/jobs/university"
-        ),
-        ApplicationModel(
-            id="seed-app-figma",
-            internship_id="seed-figma-ds",
-            company="Figma",
-            role="Design Systems & Core UI Intern",
-            status="Saved",
-            deadline=today + timedelta(days=18),
-            match_score=78,
-            next_action="Tailor resume and attach portfolio link before applying",
-            notes="Job posting closes soon. Need to finalize design token project demo.",
-            job_url="https://figma.com/careers"
-        ),
-        ApplicationModel(
-            id="seed-app-datadog",
-            internship_id=None,
-            company="Datadog",
-            role="Software Engineering Intern — Observability",
-            status="Selected",
-            applied_date=today - timedelta(days=35),
-            match_score=94,
-            next_action="Review formal offer letter and sign paperwork",
-            notes="Offer received: $54/hr + housing stipend. Deadline to accept is next Friday.",
-            job_url="https://datadoghq.com/careers"
-        ),
-        ApplicationModel(
-            id="seed-app-meta",
-            internship_id=None,
-            company="Meta",
-            role="Software Engineer Intern — Core Systems",
-            status="Rejected",
-            applied_date=today - timedelta(days=40),
-            match_score=71,
-            next_action="Reapply in autumn for next cycle",
-            notes="Position filled for current term. Reached technical screen round.",
-            job_url="https://metacareers.com"
-        )
-    ]
-
-    for app in applications:
-        db.add(app)
-
-    db.commit()
+async def seed_demo_data():
+    async with AsyncSessionLocal() as session:
+        for data in DEMO_INTERNSHIPS:
+            existing = await session.get(Internship, data.get("id", ""))
+            # Check by company+title to avoid duplication
+            from sqlalchemy import select
+            stmt = select(Internship).where(
+                Internship.company == data["company"],
+                Internship.title == data["title"],
+                Internship.is_demo == True
+            )
+            result = await session.execute(stmt)
+            if result.scalar_one_or_none() is None:
+                internship = Internship(id=str(uuid.uuid4()), **data)
+                session.add(internship)
+        await session.commit()
+    print("Demo seed data loaded.")

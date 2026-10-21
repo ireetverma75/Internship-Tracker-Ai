@@ -1,92 +1,92 @@
-"""SQLAlchemy models for Internship Tracker AI."""
 import uuid
 from datetime import datetime, date
-from sqlalchemy import (
-    Column,
-    String,
-    Boolean,
-    DateTime,
-    Date,
-    Integer,
-    Text,
-    JSON,
-    ForeignKey
-)
-from sqlalchemy.orm import relationship
-from app.db.session import Base
+from sqlalchemy import String, Text, Integer, Boolean, Date, DateTime, ARRAY, ForeignKey, CheckConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.sqlite import JSON
+from app.db.database import Base
 
+def gen_uuid():
+    return str(uuid.uuid4())
 
-class InternshipModel(Base):
-    __tablename__ = "internships"
-
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = Column(String(64), nullable=True, index=True)
-    company = Column(String(255), nullable=False)
-    role = Column(String(255), nullable=False)
-    description = Column(Text, nullable=True)
-    location = Column(String(255), default="Remote")
-    work_mode = Column(String(50), default="Remote")  # Remote, Hybrid, On-site
-    stipend = Column(String(100), nullable=True)
-    deadline = Column(Date, nullable=True, index=True)
-    job_url = Column(Text, nullable=True)
-    required_skills = Column(JSON, default=list)
-    preferred_skills = Column(JSON, default=list)
-    eligibility = Column(Text, nullable=True)
-    notes = Column(Text, nullable=True)
-    is_demo = Column(Boolean, default=False)
-    is_saved = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    applications = relationship("ApplicationModel", back_populates="internship", cascade="all, delete-orphan")
-
-
-class ApplicationModel(Base):
-    __tablename__ = "applications"
-
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = Column(String(64), nullable=True, index=True)
-    internship_id = Column(String(36), ForeignKey("internships.id", ondelete="SET NULL"), nullable=True)
-    company = Column(String(255), nullable=False)
-    role = Column(String(255), nullable=False)
-    status = Column(String(50), default="Saved", index=True)  # Saved, Applied, Assessment, Interview, Selected, Rejected
-    applied_date = Column(Date, nullable=True)
-    interview_date = Column(Date, nullable=True)
-    deadline = Column(Date, nullable=True, index=True)
-    match_score = Column(Integer, nullable=True)
-    next_action = Column(String(255), nullable=True)
-    notes = Column(Text, nullable=True)
-    job_url = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    internship = relationship("InternshipModel", back_populates="applications")
-
-
-class ProfileModel(Base):
+class Profile(Base):
     __tablename__ = "profiles"
 
-    id = Column(String(64), primary_key=True)
-    email = Column(String(255), nullable=False)
-    full_name = Column(String(255), nullable=True)
-    university = Column(String(255), nullable=True)
-    degree = Column(String(255), nullable=True)
-    graduation_year = Column(Integer, nullable=True)
-    skills = Column(JSON, default=list)
-    preferred_roles = Column(JSON, default=list)
-    preferred_locations = Column(JSON, default=list)
-    preferred_work_modes = Column(JSON, default=list)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=gen_uuid)
+    user_id: Mapped[str] = mapped_column(String, unique=True, nullable=False, index=True)
+    full_name: Mapped[str | None] = mapped_column(String(200))
+    degree: Mapped[str | None] = mapped_column(String(100))
+    specialization: Mapped[str | None] = mapped_column(String(100))
+    graduation_year: Mapped[int | None] = mapped_column(Integer)
+    skills: Mapped[str] = mapped_column(JSON, default=list)
+    programming_languages: Mapped[str] = mapped_column(JSON, default=list)
+    frameworks: Mapped[str] = mapped_column(JSON, default=list)
+    certifications: Mapped[str] = mapped_column(JSON, default=list)
+    project_titles: Mapped[str] = mapped_column(JSON, default=list)
+    career_interests: Mapped[str | None] = mapped_column(Text)
+    preferred_locations: Mapped[str | None] = mapped_column(String(200))
+    preferred_work_mode: Mapped[str] = mapped_column(String(20), default="any")
+    role: Mapped[str] = mapped_column(String(20), default="student")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-
-class ResumeModel(Base):
+class Resume(Base):
     __tablename__ = "resumes"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = Column(String(64), nullable=True, index=True)
-    filename = Column(String(255), nullable=False)
-    file_size_bytes = Column(Integer, nullable=False)
-    parsed_text = Column(Text, nullable=True)
-    extracted_skills = Column(JSON, default=list)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=gen_uuid)
+    user_id: Mapped[str] = mapped_column(String, unique=True, nullable=False, index=True)
+    filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    storage_path: Mapped[str] = mapped_column(String(500), nullable=False)
+    file_size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
+    parse_status: Mapped[str] = mapped_column(String(20), default="pending")
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    parsed_at: Mapped[datetime | None] = mapped_column(DateTime)
+
+class Internship(Base):
+    __tablename__ = "internships"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=gen_uuid)
+    company: Mapped[str] = mapped_column(String(200), nullable=False)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    required_skills: Mapped[str] = mapped_column(JSON, default=list)
+    preferred_skills: Mapped[str] = mapped_column(JSON, default=list)
+    degree_requirement: Mapped[str | None] = mapped_column(String(100))
+    experience_level: Mapped[str] = mapped_column(String(50), default="entry")
+    location: Mapped[str | None] = mapped_column(String(200))
+    work_mode: Mapped[str] = mapped_column(String(20), default="any")
+    stipend_min: Mapped[int | None] = mapped_column(Integer)
+    stipend_max: Mapped[int | None] = mapped_column(Integer)
+    currency: Mapped[str] = mapped_column(String(10), default="INR")
+    official_url: Mapped[str | None] = mapped_column(String(500))
+    deadline: Mapped[date | None] = mapped_column(Date)
+    source: Mapped[str] = mapped_column(String(50), default="manual")
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by: Mapped[str | None] = mapped_column(String)
+
+class SavedInternship(Base):
+    __tablename__ = "saved_internships"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=gen_uuid)
+    user_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    internship_id: Mapped[str] = mapped_column(String, ForeignKey("internships.id"), nullable=False)
+    saved_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+class Application(Base):
+    __tablename__ = "applications"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=gen_uuid)
+    user_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    internship_id: Mapped[str | None] = mapped_column(String, ForeignKey("internships.id"))
+    company_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    role_title: Mapped[str] = mapped_column(String(200), nullable=False)
+    status: Mapped[str] = mapped_column(String(30), default="saved")
+    applied_date: Mapped[date | None] = mapped_column(Date)
+    interview_date: Mapped[date | None] = mapped_column(Date)
+    deadline: Mapped[date | None] = mapped_column(Date)
+    notes: Mapped[str | None] = mapped_column(Text)
+    external_url: Mapped[str | None] = mapped_column(String(500))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -1,50 +1,60 @@
-"""Pydantic schemas for Internships."""
+from pydantic import BaseModel, HttpUrl, field_validator
+from typing import Optional
 from datetime import date, datetime
-from typing import List, Optional
-from pydantic import BaseModel, Field
-
 
 class InternshipBase(BaseModel):
-    company: str = Field(..., min_length=1, max_length=255, description="Company name")
-    role: str = Field(..., min_length=1, max_length=255, description="Role title")
-    description: Optional[str] = None
-    location: Optional[str] = "Remote"
-    work_mode: Optional[str] = "Remote"
-    stipend: Optional[str] = None
+    company: str
+    title: str
+    description: str
+    required_skills: list[str] = []
+    preferred_skills: list[str] = []
+    degree_requirement: Optional[str] = None
+    experience_level: str = "entry"
+    location: Optional[str] = None
+    work_mode: str = "any"
+    stipend_min: Optional[int] = None
+    stipend_max: Optional[int] = None
+    currency: str = "INR"
+    official_url: Optional[str] = None
     deadline: Optional[date] = None
-    job_url: Optional[str] = None
-    required_skills: List[str] = Field(default_factory=list)
-    preferred_skills: List[str] = Field(default_factory=list)
-    eligibility: Optional[str] = None
-    notes: Optional[str] = None
-    is_saved: Optional[bool] = False
-    is_demo: Optional[bool] = False
-
+    source: str = "manual"
+    is_demo: bool = False
 
 class InternshipCreate(InternshipBase):
     pass
 
-
 class InternshipUpdate(BaseModel):
     company: Optional[str] = None
-    role: Optional[str] = None
+    title: Optional[str] = None
     description: Optional[str] = None
+    required_skills: Optional[list[str]] = None
+    preferred_skills: Optional[list[str]] = None
     location: Optional[str] = None
     work_mode: Optional[str] = None
-    stipend: Optional[str] = None
+    stipend_min: Optional[int] = None
+    stipend_max: Optional[int] = None
+    official_url: Optional[str] = None
     deadline: Optional[date] = None
-    job_url: Optional[str] = None
-    required_skills: Optional[List[str]] = None
-    preferred_skills: Optional[List[str]] = None
-    eligibility: Optional[str] = None
-    notes: Optional[str] = None
-    is_saved: Optional[bool] = None
+    is_active: Optional[bool] = None
 
+class MatchDetails(BaseModel):
+    score: float
+    matched_skills: list[str] = []
+    missing_skills: list[str] = []
+    explanation: str = ""
 
-class InternshipResponse(InternshipBase):
+class InternshipOut(InternshipBase):
     id: str
-    user_id: Optional[str] = None
+    is_active: bool
     created_at: datetime
     updated_at: datetime
+    match_details: Optional[MatchDetails] = None
+    is_saved: bool = False
 
     model_config = {"from_attributes": True}
+
+class PaginatedInternships(BaseModel):
+    items: list[InternshipOut]
+    total: int
+    page: int
+    per_page: int
