@@ -396,137 +396,154 @@ function ResumeMatchContent() {
               </div>
 
               {/* Skills Comparison Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Matched Required Skills */}
-                <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/25 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>
-                      Matched Required Skills ({matchResult.matched_required_skills.length})
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {matchResult.matched_required_skills.length === 0 ? (
-                      <span className="text-xs text-slate-500">None detected</span>
-                    ) : (
-                      matchResult.matched_required_skills.map((s) => (
-                        <span
-                          key={s}
-                          className="px-2 py-0.5 rounded text-xs bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-medium"
-                        >
-                          {s}
-                        </span>
-                      ))
+              {(() => {
+                const matchedReq = matchResult.matched_required_skills || (matchResult as any).matched_skills || [];
+                const missingReq = matchResult.missing_required_skills || (matchResult as any).missing_skills || [];
+                const prefFound = matchResult.preferred_skills_found || [];
+                const evidence = matchResult.relevant_experience_evidence || [];
+                const tips = matchResult.resume_improvement_suggestions || (matchResult as any).recommendations || [];
+                const upskill = matchResult.recommended_skills_to_learn || [];
+
+                return (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Matched Required Skills */}
+                      <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/25 space-y-2">
+                        <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                          <CheckCircle2 className="h-4 w-4" />
+                          <span>
+                            Matched Required Skills ({matchedReq.length})
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {matchedReq.length === 0 ? (
+                            <span className="text-xs text-slate-500">None detected</span>
+                          ) : (
+                            matchedReq.map((s) => (
+                              <span
+                                key={s}
+                                className="px-2 py-0.5 rounded text-xs bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-medium"
+                              >
+                                {s}
+                              </span>
+                            ))
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Missing Required Skills */}
+                      <div className="p-4 rounded-xl bg-rose-950/20 border border-rose-500/25 space-y-2">
+                        <div className="flex items-center gap-2 text-xs font-bold text-rose-400">
+                          <XCircle className="h-4 w-4" />
+                          <span>
+                            Missing Required Skills ({missingReq.length})
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {missingReq.length === 0 ? (
+                            <span className="text-xs text-emerald-400">All required skills matched!</span>
+                          ) : (
+                            missingReq.map((s) => (
+                              <span
+                                key={s}
+                                className="px-2 py-0.5 rounded text-xs bg-rose-500/15 text-rose-300 border border-rose-500/30 font-medium"
+                              >
+                                {s}
+                              </span>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Preferred Skills */}
+                    {prefFound.length > 0 && (
+                      <div className="p-4 rounded-xl bg-[#35D5F2]/10 border border-[#35D5F2]/25">
+                        <div className="flex items-center gap-2 text-xs font-bold text-[#35D5F2] mb-2">
+                          <Sparkles className="h-4 w-4" />
+                          <span>Bonus / Preferred Skills Detected</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {prefFound.map((s) => (
+                            <span
+                              key={s}
+                              className="px-2 py-0.5 rounded text-xs bg-[#35D5F2]/20 text-[#35D5F2] border border-[#35D5F2]/30 font-medium"
+                            >
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     )}
-                  </div>
-                </div>
 
-                {/* Missing Required Skills */}
-                <div className="p-4 rounded-xl bg-rose-950/20 border border-rose-500/25 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-rose-400">
-                    <XCircle className="h-4 w-4" />
-                    <span>
-                      Missing Required Skills ({matchResult.missing_required_skills.length})
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {matchResult.missing_required_skills.length === 0 ? (
-                      <span className="text-xs text-emerald-400">All required skills matched!</span>
-                    ) : (
-                      matchResult.missing_required_skills.map((s) => (
-                        <span
-                          key={s}
-                          className="px-2 py-0.5 rounded text-xs bg-rose-500/15 text-rose-300 border border-rose-500/30 font-medium"
-                        >
-                          {s}
-                        </span>
-                      ))
+                    {/* Relevant Experience Evidence */}
+                    {evidence.length > 0 && (
+                      <div>
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-2">
+                          <BookOpen className="h-4 w-4 text-[#4F7CFF]" />
+                          <span>Resume Text Evidence Extracts</span>
+                        </h4>
+                        <div className="space-y-2">
+                          {evidence.map((snippet, idx) => (
+                            <blockquote
+                              key={idx}
+                              className="p-3 rounded-xl bg-slate-900 border-l-2 border-[#4F7CFF] text-xs text-slate-300 italic"
+                            >
+                              "{snippet}"
+                            </blockquote>
+                          ))}
+                        </div>
+                      </div>
                     )}
-                  </div>
-                </div>
-              </div>
 
-              {/* Preferred Skills */}
-              {matchResult.preferred_skills_found.length > 0 && (
-                <div className="p-4 rounded-xl bg-[#35D5F2]/10 border border-[#35D5F2]/25">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#35D5F2] mb-2">
-                    <Sparkles className="h-4 w-4" />
-                    <span>Bonus / Preferred Skills Detected</span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {matchResult.preferred_skills_found.map((s) => (
-                      <span
-                        key={s}
-                        className="px-2 py-0.5 rounded text-xs bg-[#35D5F2]/20 text-[#35D5F2] border border-[#35D5F2]/30 font-medium"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+                    {/* Actionable Resume Improvement Suggestions */}
+                    {tips.length > 0 && (
+                      <div>
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-2">
+                          <Lightbulb className="h-4 w-4 text-amber-400" />
+                          <span>Tailored Optimization Suggestions</span>
+                        </h4>
+                        <ul className="space-y-2 text-xs text-slate-300">
+                          {tips.map((tip, idx) => (
+                            <li key={idx} className="flex items-start gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                              <span className="h-1.5 w-1.5 rounded-full bg-amber-400 shrink-0 mt-1.5" />
+                              <span>{tip}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
-              {/* Relevant Experience Evidence */}
-              <div>
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-[#4F7CFF]" />
-                  <span>Resume Text Evidence Extracts</span>
-                </h4>
-                <div className="space-y-2">
-                  {matchResult.relevant_experience_evidence.map((snippet, idx) => (
-                    <blockquote
-                      key={idx}
-                      className="p-3 rounded-xl bg-slate-900 border-l-2 border-[#4F7CFF] text-xs text-slate-300 italic"
-                    >
-                      "{snippet}"
-                    </blockquote>
-                  ))}
-                </div>
-              </div>
+                    {/* Recommended Skills to Learn */}
+                    {upskill.length > 0 && (
+                      <div>
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-2">
+                          Recommended Technologies to Upskill
+                        </h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {upskill.map((skill) => (
+                            <Badge key={skill} variant="warning">
+                              + {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-              {/* Actionable Resume Improvement Suggestions */}
-              <div>
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-amber-400" />
-                  <span>Tailored Optimization Suggestions</span>
-                </h4>
-                <ul className="space-y-2 text-xs text-slate-300">
-                  {matchResult.resume_improvement_suggestions.map((tip, idx) => (
-                    <li key={idx} className="flex items-start gap-2 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                      <span className="h-1.5 w-1.5 rounded-full bg-amber-400 shrink-0 mt-1.5" />
-                      <span>{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Recommended Skills to Learn */}
-              {matchResult.recommended_skills_to_learn.length > 0 && (
-                <div>
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-2">
-                    Recommended Technologies to Upskill
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {matchResult.recommended_skills_to_learn.map((skill) => (
-                      <Badge key={skill} variant="warning">
-                        + {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Scoring Methodology & Privacy Disclaimer */}
-              <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 text-[11px] text-slate-400 space-y-1">
-                <div className="flex items-center gap-1.5 font-semibold text-slate-300">
-                  <Info className="h-3.5 w-3.5 text-[#4F7CFF]" />
-                  <span>Methodology & Disclaimer</span>
-                </div>
-                <p>{matchResult.scoring_explanation}</p>
-                <p className="text-slate-500 text-[10px] pt-1">
-                  Privacy Notice: Resume text is processed strictly in-memory for this evaluation. No persistent document storage is maintained without explicit consent.
-                </p>
-              </div>
+                    {/* Scoring Methodology & Privacy Disclaimer */}
+                    <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                      <div className="flex items-center gap-1.5 font-semibold text-slate-300">
+                        <Info className="h-3.5 w-3.5 text-[#4F7CFF]" />
+                        <span>Methodology & Disclaimer</span>
+                      </div>
+                      <p>{matchResult.scoring_explanation || "Transparent technical requirements compatibility evaluation."}</p>
+                      <p className="text-slate-500 text-[10px] pt-1">
+                        Privacy Notice: Resume text is processed strictly in-memory for this evaluation. No persistent document storage is maintained without explicit consent.
+                      </p>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           ) : (
             <div className="p-12 rounded-2xl bg-[#111827] border border-slate-800 text-center max-w-md mx-auto my-12">

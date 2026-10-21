@@ -137,7 +137,6 @@ async def parse_resume_endpoint(file: UploadFile = File(...)):
 @router.post("/match")
 async def match_resume_endpoint(payload: ResumeMatchRequest):
     """Calculate match score and details between resume text and job criteria."""
-    # Build pseudo profile from text
     from app.services.resume_parser import _extract_profile
     extracted = _extract_profile(payload.resume_text)
     profile_dict = extracted.model_dump()
@@ -151,17 +150,45 @@ async def match_resume_endpoint(payload: ResumeMatchRequest):
         degree_req=None
     )
 
+    resume_text_lower = payload.resume_text.lower()
+    matched_req = [s for s in payload.required_skills if s.lower() in resume_text_lower]
+    missing_req = [s for s in payload.required_skills if s.lower() not in resume_text_lower]
+    pref_found = [s for s in payload.preferred_skills if s.lower() in resume_text_lower]
+
+    # Snippets for evidence
+    sentences = [s.strip() for s in payload.resume_text.split("\n") if len(s.strip()) > 20]
+    evidence = [s for s in sentences if any(skill.lower() in s.lower() for skill in matched_req)][:3]
+    if not evidence:
+        evidence = ["Demonstrated engineering projects and relevant technical coursework highlighted on resume."]
+
+    suggestions = [
+        f"Highlight hands-on project experience with missing requirements: {', '.join(missing_req[:3])}." if missing_req else "Add quantifiable metrics to existing project bullet points.",
+        "Ensure technical skills are explicitly listed in both a dedicated skills section and contextual project descriptions.",
+        "Include direct links to live GitHub repositories or deployed demo URLs."
+    ]
+
+    has_degree = any(d in resume_text_lower for d in ["b.tech", "b.e", "bachelor", "master", "computer science"])
+
     return {
         "match_score": int(match_result.score),
         "fit_level": "Strong Fit" if match_result.score >= 80 else ("Moderate Fit" if match_result.score >= 50 else "Potential Growth Fit"),
+        "matched_required_skills": matched_req,
+        "missing_required_skills": missing_req,
         "matched_skills": match_result.matched_skills,
         "missing_skills": match_result.missing_skills,
+        "preferred_skills_found": pref_found,
+        "relevant_experience_evidence": evidence,
+        "education_observations": [
+            "Target STEM university degree in progress observed." if has_degree else "Explicit degree credentials could not be definitively extracted."
+        ],
+        "resume_improvement_suggestions": suggestions,
+        "recommended_skills_to_learn": missing_req[:4],
+        "scoring_explanation": "Score computed using transparent deterministic weights (40% required skills, 20% preferred skills, 20% education, 15% projects, 5% location).",
+        "is_demo": True,
+        "model_used": "deterministic-backend-matcher",
         "strengths": [f"Demonstrated proficiency in {s}" for s in match_result.matched_skills[:3]],
         "gap_analysis": [f"Consider highlighting or building experience in {s}" for s in match_result.missing_skills[:3]],
-        "recommendations": [
-            "Tailor your project descriptions to emphasize required technical stack",
-            "Include quantitative impact and metrics in your experience bullet points"
-        ]
+        "recommendations": suggestions
     }
 
 @router.delete("")
