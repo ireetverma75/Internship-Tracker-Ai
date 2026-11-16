@@ -42,14 +42,18 @@ export class DataStore {
 
   // INTERNSHIPS
   async getInternships(): Promise<Internship[]> {
-    // Try backend if online
-    if (this.isBackendOnline) {
-      try {
-        const remote = await api.getInternships();
-        if (remote && remote.length > 0) return remote;
-      } catch {
-        this.isBackendOnline = false;
+    // Proactively try backend first
+    try {
+      const remote = await api.getInternships();
+      if (remote && Array.isArray(remote)) {
+        this.isBackendOnline = true;
+        if (typeof window !== "undefined") {
+          localStorage.setItem(STORAGE_KEY_INTERNSHIPS, JSON.stringify(remote));
+        }
+        return remote;
       }
+    } catch {
+      this.isBackendOnline = false;
     }
 
     // Local Storage fallback
@@ -77,15 +81,19 @@ export class DataStore {
   async saveInternship(item: Partial<Internship>): Promise<Internship> {
     let created: Internship;
 
-    // Try backend if online
-    if (this.isBackendOnline) {
-      try {
-        created = await api.createInternship(item);
-        notifyChange();
-        return created;
-      } catch {
-        this.isBackendOnline = false;
+    // Try backend
+    try {
+      created = await api.createInternship(item);
+      this.isBackendOnline = true;
+      const list = await this.getInternships();
+      const updated = [created, ...list.filter((i) => i.id !== created.id)];
+      if (typeof window !== "undefined") {
+        localStorage.setItem(STORAGE_KEY_INTERNSHIPS, JSON.stringify(updated));
       }
+      notifyChange();
+      return created;
+    } catch {
+      this.isBackendOnline = false;
     }
 
     // Local storage
@@ -122,14 +130,19 @@ export class DataStore {
     id: string,
     updates: Partial<Internship>
   ): Promise<Internship | null> {
-    if (this.isBackendOnline) {
-      try {
-        const res = await api.updateInternship(id, updates);
-        notifyChange();
-        return res;
-      } catch {
-        this.isBackendOnline = false;
+    try {
+      const res = await api.updateInternship(id, updates);
+      this.isBackendOnline = true;
+      const list = await this.getInternships();
+      const idx = list.findIndex((i) => i.id === id);
+      if (idx !== -1) list[idx] = res;
+      if (typeof window !== "undefined") {
+        localStorage.setItem(STORAGE_KEY_INTERNSHIPS, JSON.stringify(list));
       }
+      notifyChange();
+      return res;
+    } catch {
+      this.isBackendOnline = false;
     }
 
     const list = await this.getInternships();
@@ -151,12 +164,11 @@ export class DataStore {
   }
 
   async deleteInternship(id: string): Promise<boolean> {
-    if (this.isBackendOnline) {
-      try {
-        await api.deleteInternship(id);
-      } catch {
-        this.isBackendOnline = false;
-      }
+    try {
+      await api.deleteInternship(id);
+      this.isBackendOnline = true;
+    } catch {
+      this.isBackendOnline = false;
     }
 
     const list = await this.getInternships();
@@ -170,13 +182,17 @@ export class DataStore {
 
   // APPLICATIONS
   async getApplications(): Promise<Application[]> {
-    if (this.isBackendOnline) {
-      try {
-        const remote = await api.getApplications();
-        if (remote && remote.length > 0) return remote;
-      } catch {
-        this.isBackendOnline = false;
+    try {
+      const remote = await api.getApplications();
+      if (remote && Array.isArray(remote)) {
+        this.isBackendOnline = true;
+        if (typeof window !== "undefined") {
+          localStorage.setItem(STORAGE_KEY_APPLICATIONS, JSON.stringify(remote));
+        }
+        return remote;
       }
+    } catch {
+      this.isBackendOnline = false;
     }
 
     if (typeof window === "undefined") return INITIAL_APPLICATIONS;
@@ -198,14 +214,18 @@ export class DataStore {
   async saveApplication(app: Partial<Application>): Promise<Application> {
     let created: Application;
 
-    if (this.isBackendOnline) {
-      try {
-        created = await api.createApplication(app);
-        notifyChange();
-        return created;
-      } catch {
-        this.isBackendOnline = false;
+    try {
+      created = await api.createApplication(app);
+      this.isBackendOnline = true;
+      const list = await this.getApplications();
+      const updated = [created, ...list.filter((a) => a.id !== created.id)];
+      if (typeof window !== "undefined") {
+        localStorage.setItem(STORAGE_KEY_APPLICATIONS, JSON.stringify(updated));
       }
+      notifyChange();
+      return created;
+    } catch {
+      this.isBackendOnline = false;
     }
 
     const list = await this.getApplications();
@@ -238,14 +258,19 @@ export class DataStore {
     id: string,
     updates: Partial<Application>
   ): Promise<Application | null> {
-    if (this.isBackendOnline) {
-      try {
-        const res = await api.updateApplication(id, updates);
-        notifyChange();
-        return res;
-      } catch {
-        this.isBackendOnline = false;
+    try {
+      const res = await api.updateApplication(id, updates);
+      this.isBackendOnline = true;
+      const list = await this.getApplications();
+      const idx = list.findIndex((a) => a.id === id);
+      if (idx !== -1) list[idx] = res;
+      if (typeof window !== "undefined") {
+        localStorage.setItem(STORAGE_KEY_APPLICATIONS, JSON.stringify(list));
       }
+      notifyChange();
+      return res;
+    } catch {
+      this.isBackendOnline = false;
     }
 
     const list = await this.getApplications();
@@ -267,12 +292,11 @@ export class DataStore {
   }
 
   async deleteApplication(id: string): Promise<boolean> {
-    if (this.isBackendOnline) {
-      try {
-        await api.deleteApplication(id);
-      } catch {
-        this.isBackendOnline = false;
-      }
+    try {
+      await api.deleteApplication(id);
+      this.isBackendOnline = true;
+    } catch {
+      this.isBackendOnline = false;
     }
 
     const list = await this.getApplications();
@@ -284,8 +308,17 @@ export class DataStore {
     return true;
   }
 
-  // METRICS COMPUTATION (Always derived from live dataset)
+  // METRICS COMPUTATION (Always derived from live dataset or fallback)
   async computeDashboardMetrics(): Promise<DashboardMetrics> {
+    try {
+      const remoteStats = await api.getDashboardStats();
+      if (remoteStats && typeof remoteStats.savedInternshipsCount === "number") {
+        return remoteStats;
+      }
+    } catch {
+      // calculate fallback
+    }
+
     const [internships, applications] = await Promise.all([
       this.getInternships(),
       this.getApplications()
@@ -348,22 +381,85 @@ export class DataStore {
   }
 
   // PROFILE
+  async fetchStudentProfile(): Promise<StudentProfile> {
+    try {
+      const remote = await api.getProfile();
+      if (remote) {
+        if (typeof window !== "undefined") {
+          localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(remote));
+        }
+        return remote;
+      }
+    } catch {
+      // fallback
+    }
+    return this.getStudentProfile();
+  }
+
   getStudentProfile(): StudentProfile {
     if (typeof window === "undefined") return INITIAL_PROFILE;
     const stored = localStorage.getItem(STORAGE_KEY_PROFILE);
     if (!stored) return INITIAL_PROFILE;
     try {
-      return JSON.parse(stored);
+      const parsed = JSON.parse(stored) as Partial<StudentProfile>;
+
+      return {
+        ...INITIAL_PROFILE,
+        ...parsed,
+        id: String(parsed.id ?? INITIAL_PROFILE.id),
+        email: String(parsed.email ?? INITIAL_PROFILE.email),
+        full_name: String(parsed.full_name ?? INITIAL_PROFILE.full_name),
+        university: String(parsed.university ?? INITIAL_PROFILE.university),
+        degree: String(parsed.degree ?? INITIAL_PROFILE.degree),
+        graduation_year: Number(parsed.graduation_year ?? INITIAL_PROFILE.graduation_year),
+        skills: Array.isArray(parsed.skills) ? parsed.skills : INITIAL_PROFILE.skills,
+        preferred_roles: Array.isArray(parsed.preferred_roles)
+          ? parsed.preferred_roles
+          : INITIAL_PROFILE.preferred_roles,
+        preferred_locations: Array.isArray(parsed.preferred_locations)
+          ? parsed.preferred_locations
+          : INITIAL_PROFILE.preferred_locations,
+        preferred_work_modes: Array.isArray(parsed.preferred_work_modes)
+          ? parsed.preferred_work_modes
+          : INITIAL_PROFILE.preferred_work_modes
+      };
     } catch {
       return INITIAL_PROFILE;
     }
   }
 
-  saveStudentProfile(profile: StudentProfile): void {
+  async saveStudentProfile(profile: StudentProfile): Promise<void> {
+    const sanitizedProfile = {
+      ...INITIAL_PROFILE,
+      ...profile,
+      id: profile.id || INITIAL_PROFILE.id,
+      email: profile.email || INITIAL_PROFILE.email,
+      full_name: profile.full_name || INITIAL_PROFILE.full_name,
+      university: profile.university || INITIAL_PROFILE.university,
+      degree: profile.degree || INITIAL_PROFILE.degree,
+      graduation_year: Number(profile.graduation_year) || INITIAL_PROFILE.graduation_year,
+      skills: Array.isArray(profile.skills) && profile.skills.length ? profile.skills : INITIAL_PROFILE.skills,
+      preferred_roles: Array.isArray(profile.preferred_roles) && profile.preferred_roles.length
+        ? profile.preferred_roles
+        : INITIAL_PROFILE.preferred_roles,
+      preferred_locations: Array.isArray(profile.preferred_locations) && profile.preferred_locations.length
+        ? profile.preferred_locations
+        : INITIAL_PROFILE.preferred_locations,
+      preferred_work_modes: Array.isArray(profile.preferred_work_modes) && profile.preferred_work_modes.length
+        ? profile.preferred_work_modes
+        : INITIAL_PROFILE.preferred_work_modes
+    };
+
     if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(profile));
-      notifyChange();
+      localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(sanitizedProfile));
     }
+    try {
+      await api.updateProfile(sanitizedProfile);
+      this.isBackendOnline = true;
+    } catch {
+      // offline fallback is preserved in localStorage
+    }
+    notifyChange();
   }
 
   // RESET & EXPORT

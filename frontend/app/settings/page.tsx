@@ -64,22 +64,22 @@ export default function SettingsPage() {
   return (
     <AppShell>
       {/* Header */}
-      <div className="pb-6 border-b border-slate-800">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-          <SettingsIcon className="h-7 w-7 text-[#4F7CFF]" />
+      <div className="pb-6 border-b border-[#E2E8F0]">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight flex items-center gap-2.5">
+          <SettingsIcon className="h-7 w-7 text-[#2563EB]" />
           <span>System Settings & Architecture</span>
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400 mt-1">
+        <p className="text-xs sm:text-sm text-[#64748B] mt-1">
           Review system runtime telemetry, database configuration, privacy safeguards, and demo data controls.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         {/* Environment & Backend Runtime Status */}
-        <div className="p-6 rounded-3xl bg-[#111827] border border-slate-800 shadow-xl space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Server className="h-4 w-4 text-[#35D5F2]" />
+        <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
+            <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
+              <Server className="h-4 w-4 text-[#2563EB]" />
               <span>Backend & Database Infrastructure</span>
             </h3>
             <Badge variant={isBackendOnline ? "success" : "warning"}>
@@ -87,68 +87,69 @@ export default function SettingsPage() {
             </Badge>
           </div>
 
-          <div className="space-y-3 text-xs text-slate-300">
-            <div className="flex justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400">Database Engine:</span>
-              <span className="font-semibold text-white">
-                Supabase PostgreSQL / SQLite Fallback
+          <div className="space-y-2.5 text-xs text-[#0F172A]">
+            <div className="flex justify-between p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="text-[#64748B]">Database Engine:</span>
+              <span className="font-semibold text-[#0F172A]">
+                PostgreSQL (Supabase) / SQLite Fallback
               </span>
             </div>
 
-            <div className="flex justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400">PDF Text Extractor:</span>
-              <span className="font-semibold text-white">
+            <div className="flex justify-between p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="text-[#64748B]">PDF Text Extractor:</span>
+              <span className="font-semibold text-[#0F172A]">
                 PyMuPDF (fitz) v1.24+
               </span>
             </div>
 
-            <div className="flex justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400">AI Scoring Engine:</span>
-              <span className="font-semibold text-white">
-                Gemini/OpenAI Adapter + Deterministic Fallback
+            <div className="flex justify-between p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="text-[#64748B]">AI Scoring Engine:</span>
+              <span className="font-semibold text-[#0F172A]">
+                TF-IDF Cosine Similarity + NLP Skill Overlap
               </span>
             </div>
 
-            <div className="flex justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-              <span className="text-slate-400">Security Architecture:</span>
-              <span className="font-semibold text-emerald-400">
-                Row Level Security (RLS) & SSRF Protection
+            <div className="flex justify-between p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="text-[#64748B]">Dataset Integration:</span>
+              <span className="font-semibold text-[#2563EB]">
+                priyaagarwal19/Jobs-tabular-dataset (1,991 records)
               </span>
             </div>
           </div>
         </div>
 
         {/* Visual Identity & Theme */}
-        <div className="p-6 rounded-3xl bg-[#111827] border border-slate-800 shadow-xl space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Palette className="h-4 w-4 text-[#4F7CFF]" />
-              <span>Visual Identity & Theme</span>
+        <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
+            <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
+              <Palette className="h-4 w-4 text-[#2563EB]" />
+              <span>Design System & Color Palette</span>
             </h3>
-            <Badge variant="primary">Midnight Navy Active</Badge>
+            <Badge variant="primary">Linear SaaS Theme</Badge>
           </div>
 
-          <p className="text-xs text-slate-400 leading-relaxed">
-            The user interface is crafted using deep midnight navy (<code className="text-slate-300">#0B1020</code>), dark slate surfaces (<code className="text-slate-300">#111827</code>), electric blue (<code className="text-slate-300">#4F7CFF</code>), and cyan highlights (<code className="text-slate-300">#35D5F2</code>).
+          <p className="text-xs text-[#64748B] leading-relaxed">
+            Crafted with clean SaaS principles: Crisp white surfaces (<code className="text-[#0F172A] font-semibold">#FFFFFF</code>), dark navy sidebar (<code className="text-[#0F172A] font-semibold">#101D35</code>), primary royal blue (<code className="text-[#0F172A] font-semibold">#2563EB</code>), and sky cyan (<code className="text-[#0F172A] font-semibold">#38BDF8</code>).
           </p>
 
           <div className="flex items-center gap-2 pt-2">
-            <div className="h-8 w-8 rounded-lg bg-[#0B1020] border border-slate-700" title="#0B1020 Midnight Navy" />
-            <div className="h-8 w-8 rounded-lg bg-[#111827] border border-slate-700" title="#111827 Dark Slate" />
-            <div className="h-8 w-8 rounded-lg bg-[#4F7CFF]" title="#4F7CFF Electric Blue" />
-            <div className="h-8 w-8 rounded-lg bg-[#35D5F2]" title="#35D5F2 Cyan Highlight" />
-            <div className="h-8 w-8 rounded-lg bg-[#10B981]" title="#10B981 Emerald Green" />
-            <div className="h-8 w-8 rounded-lg bg-[#F59E0B]" title="#F59E0B Amber Warning" />
+            <div className="h-7 w-7 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]" title="#F8FAFC Primary Background" />
+            <div className="h-7 w-7 rounded-lg bg-[#101D35]" title="#101D35 Sidebar Navy" />
+            <div className="h-7 w-7 rounded-lg bg-[#2563EB]" title="#2563EB Primary Blue" />
+            <div className="h-7 w-7 rounded-lg bg-[#38BDF8]" title="#38BDF8 Secondary Blue" />
+            <div className="h-7 w-7 rounded-lg bg-[#16A34A]" title="#16A34A Success Green" />
+            <div className="h-7 w-7 rounded-lg bg-[#F59E0B]" title="#F59E0B Warning Amber" />
+            <div className="h-7 w-7 rounded-lg bg-[#DC2626]" title="#DC2626 Danger Red" />
           </div>
         </div>
 
         {/* Data Persistence & Export Controls */}
-        <div className="p-6 rounded-3xl bg-[#111827] border border-slate-800 shadow-xl space-y-4">
-          <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">
+        <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm space-y-4">
+          <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider border-b border-[#E2E8F0] pb-3">
             Data Backup & Demonstration Management
           </h3>
 
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-[#64748B]">
             Export all tracked applications, saved opportunities, and profile settings to an offline JSON file, or restore default seed data.
           </p>
 
@@ -162,7 +163,7 @@ export default function SettingsPage() {
               variant="outline"
               size="sm"
               onClick={() => setIsResetModalOpen(true)}
-              className="text-amber-400 hover:text-amber-300 border-amber-500/30"
+              className="text-[#DC2626] hover:bg-rose-50"
             >
               <RotateCcw className="h-4 w-4 mr-1.5" />
               <span>Reset Demo Seed Records</span>
@@ -171,31 +172,31 @@ export default function SettingsPage() {
         </div>
 
         {/* Data Privacy & Compliance Notice */}
-        <div className="p-6 rounded-3xl bg-[#111827] border border-slate-800 shadow-xl space-y-4">
-          <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
-            <Shield className="h-4 w-4 text-emerald-400" />
+        <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm space-y-4">
+          <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider border-b border-[#E2E8F0] pb-3 flex items-center gap-2">
+            <Shield className="h-4 w-4 text-[#16A34A]" />
             <span>Candidate Data Privacy & Ethics</span>
           </h3>
 
-          <div className="space-y-2 text-xs text-slate-300 leading-relaxed">
+          <div className="space-y-2.5 text-xs text-[#0F172A] leading-relaxed">
             <div className="flex items-start gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-4 w-4 text-[#16A34A] shrink-0 mt-0.5" />
               <span>
-                <strong>In-Memory PDF Parsing:</strong> Resumes are processed strictly in memory via PyMuPDF; no raw document files are retained on disk without explicit consent.
+                <strong>In-Memory PDF Parsing:</strong> Resumes are processed strictly in memory via PyMuPDF; no raw document files are stored permanently without user consent.
               </span>
             </div>
 
             <div className="flex items-start gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-4 w-4 text-[#16A34A] shrink-0 mt-0.5" />
               <span>
-                <strong>No Logged Resume Content:</strong> Logging pipelines filter out full resume text to prevent PII leakage.
+                <strong>Zero PII Leakage:</strong> Server logs redact raw resume contents and credentials.
               </span>
             </div>
 
             <div className="flex items-start gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-4 w-4 text-[#16A34A] shrink-0 mt-0.5" />
               <span>
-                <strong>No Data Resale:</strong> Student data is never packaged or sold to third-party brokers.
+                <strong>No Data Reselling:</strong> Student details are private and never distributed to third parties.
               </span>
             </div>
           </div>
@@ -203,12 +204,12 @@ export default function SettingsPage() {
       </div>
 
       {/* Sign Out Section */}
-      <div className="mt-8 pt-6 border-t border-slate-800 flex items-center justify-between">
-        <span className="text-xs text-slate-500">
-          Internship Tracker AI v1.0.0 · Academic Capstone Edition
+      <div className="mt-8 pt-6 border-t border-[#E2E8F0] flex items-center justify-between">
+        <span className="text-xs text-[#64748B]">
+          Internship Tracker AI v2.0 · Linear SaaS Edition
         </span>
 
-        <Button variant="outline" size="sm" onClick={handleSignOut} className="text-rose-400 hover:bg-rose-500/10">
+        <Button variant="outline" size="sm" onClick={handleSignOut} className="text-[#DC2626] hover:bg-rose-50">
           <LogOut className="h-4 w-4 mr-1.5" />
           <span>Exit Session</span>
         </Button>

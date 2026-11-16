@@ -78,8 +78,6 @@ export const ApplicationDrawer: React.FC<ApplicationDrawerProps> = ({
     }
   };
 
-  const statusStyle = getStatusColor(status);
-
   return (
     <Drawer
       isOpen={isOpen}
@@ -90,7 +88,7 @@ export const ApplicationDrawer: React.FC<ApplicationDrawerProps> = ({
       <div className="space-y-5">
         {/* Status Selector */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+          <label className="block text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-2">
             Application Pipeline Stage
           </label>
           <div className="grid grid-cols-3 gap-1.5">
@@ -101,8 +99,8 @@ export const ApplicationDrawer: React.FC<ApplicationDrawerProps> = ({
                 onClick={() => setStatus(opt)}
                 className={`py-2 px-2.5 rounded-lg text-xs font-semibold border transition-all text-center ${
                   status === opt
-                    ? `${getStatusColor(opt).bg} ${getStatusColor(opt).text} ${getStatusColor(opt).border} ring-1 ring-[#4F7CFF]`
-                    : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                    ? `${getStatusColor(opt).bg} ${getStatusColor(opt).text} ${getStatusColor(opt).border} ring-1 ring-[#2563EB]`
+                    : "bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A]"
                 }`}
               >
                 {opt}
@@ -114,81 +112,82 @@ export const ApplicationDrawer: React.FC<ApplicationDrawerProps> = ({
         {/* Dates */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-[#0F172A] mb-1">
               Applied Date
             </label>
             <Input
               type="date"
               value={appliedDate}
               onChange={(e) => setAppliedDate(e.target.value)}
-              className="text-xs"
+              className="text-xs bg-[#F8FAFC]"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-[#0F172A] mb-1">
               Interview Date
             </label>
             <Input
               type="date"
               value={interviewDate}
               onChange={(e) => setInterviewDate(e.target.value)}
-              className="text-xs"
+              className="text-xs bg-[#F8FAFC]"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-[#0F172A] mb-1">
             Application Deadline
           </label>
           <Input
             type="date"
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
-            className="text-xs"
+            className="text-xs bg-[#F8FAFC]"
           />
         </div>
 
         {/* Next Action */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-[#0F172A] mb-1">
             Next Action / Milestone
           </label>
           <Input
             value={nextAction}
             onChange={(e) => setNextAction(e.target.value)}
             placeholder="e.g. Prepare system design round, follow up with recruiter"
-            className="text-xs"
+            className="text-xs bg-[#F8FAFC]"
           />
         </div>
 
         {/* Notes */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-[#0F172A] mb-1">
             Application Notes & Interview Reflection
           </label>
           <Textarea
-            rows={5}
+            rows={4}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Log technical questions asked, interview feedback, or recruiter communications..."
-            className="text-xs"
+            className="text-xs bg-[#F8FAFC]"
           />
         </div>
 
         {/* Match score indicator if present */}
         {application.match_score && (
-          <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
-            <span className="text-slate-400">Recorded Resume Match Score:</span>
-            <Badge variant="success">{application.match_score}% Match</Badge>
+          <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200 flex items-center justify-between text-xs">
+            <span className="text-[#0F172A] font-medium">Recorded Resume Match Score:</span>
+            <Badge variant="primary">{application.match_score}% Match</Badge>
           </div>
         )}
 
         {/* Footer Actions */}
-        <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+        <div className="pt-4 border-t border-[#E2E8F0] flex items-center justify-between">
           <Button
             variant="outline"
-            className="text-rose-400 hover:bg-rose-500/10"
+            className="text-[#DC2626] hover:bg-rose-50"
+            size="sm"
             onClick={() => {
               onDelete(application.id);
               onClose();
@@ -199,10 +198,10 @@ export const ApplicationDrawer: React.FC<ApplicationDrawerProps> = ({
           </Button>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" size="sm" onClick={onClose}>
               Cancel
             </Button>
-            <Button onClick={handleSave} isLoading={isSaving}>
+            <Button size="sm" onClick={handleSave} isLoading={isSaving}>
               Save Updates
             </Button>
           </div>

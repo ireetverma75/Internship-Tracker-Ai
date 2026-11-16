@@ -28,26 +28,26 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1020] disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]";
+      "inline-flex items-center justify-center font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] select-none cursor-pointer";
 
     const variants = {
       primary:
-        "bg-[#4F7CFF] hover:bg-[#3d6bf0] text-white shadow-lg shadow-[#4F7CFF]/20 border border-[#4F7CFF]/30",
+        "bg-gradient-to-r from-[#60A5FA] to-[#22D3EE] hover:brightness-110 text-[#061225] shadow-[0_8px_24px_rgba(34,211,238,0.18)] border border-white/20 font-semibold",
       secondary:
-        "bg-[#1E293B] hover:bg-[#27354A] text-[#F8FAFC] border border-white/5",
+        "bg-white/10 hover:bg-white/15 text-slate-100 border border-white/15 backdrop-blur-xl",
       outline:
-        "border border-slate-700 hover:border-slate-500 bg-transparent text-[#F8FAFC] hover:bg-slate-800/50",
-      ghost: "hover:bg-slate-800/60 text-[#94A3B8] hover:text-[#F8FAFC]",
+        "border border-white/15 hover:border-white/30 bg-white/5 text-slate-100 hover:bg-white/10 shadow-2xs backdrop-blur-xl",
+      ghost: "hover:bg-white/10 text-slate-300 hover:text-white",
       destructive:
-        "bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/20",
+        "bg-[#DC2626] hover:bg-[#B91C1C] text-white shadow-xs font-semibold",
       accent:
-        "bg-[#35D5F2] hover:bg-[#29c3de] text-[#0B1020] font-semibold shadow-lg shadow-[#35D5F2]/20"
+        "bg-gradient-to-r from-[#22D3EE] to-[#60A5FA] hover:brightness-110 text-[#061225] shadow-xs font-semibold"
     };
 
     const sizes = {
-      sm: "h-8 px-3 text-xs rounded-md gap-1.5",
-      md: "h-10 px-4 text-sm rounded-lg gap-2",
-      lg: "h-12 px-6 text-base rounded-xl gap-2.5",
+      sm: "h-8 px-3 text-xs rounded-lg gap-1.5",
+      md: "h-9 px-4 text-sm rounded-lg gap-2",
+      lg: "h-11 px-5 text-base rounded-xl gap-2.5",
       icon: "h-9 w-9 rounded-lg"
     };
 

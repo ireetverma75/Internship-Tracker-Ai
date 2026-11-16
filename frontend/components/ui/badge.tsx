@@ -19,13 +19,13 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const variants = {
-    default: "bg-slate-800 text-slate-300 border-slate-700/60",
-    primary: "bg-blue-500/10 text-[#4F7CFF] border-blue-500/25",
-    accent: "bg-[#35D5F2]/10 text-[#35D5F2] border-[#35D5F2]/25",
-    success: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
-    warning: "bg-amber-500/10 text-amber-400 border-amber-500/25",
-    danger: "bg-rose-500/10 text-rose-400 border-rose-500/25",
-    outline: "bg-transparent text-slate-300 border-slate-700"
+    default: "bg-slate-100 text-slate-700 border-slate-200",
+    primary: "bg-blue-50 text-[#2563EB] border-blue-200/80 font-semibold",
+    accent: "bg-sky-50 text-[#0284C7] border-sky-200 font-semibold",
+    success: "bg-emerald-50 text-[#16A34A] border-emerald-200 font-semibold",
+    warning: "bg-amber-50 text-[#D97706] border-amber-200 font-semibold",
+    danger: "bg-red-50 text-[#DC2626] border-red-200 font-semibold",
+    outline: "bg-white text-slate-700 border-slate-200 shadow-2xs"
   };
 
   return (

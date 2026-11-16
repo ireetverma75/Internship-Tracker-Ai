@@ -206,11 +206,11 @@ export const INITIAL_APPLICATIONS: Application[] = [
 
 export const INITIAL_PROFILE: StudentProfile = {
   id: "student-1",
-  email: "alex.chen@university.edu",
-  full_name: "Alex Chen",
-  university: "University of Washington",
+  email: "student@university.edu",
+  full_name: "Student User",
+  university: "Your University",
   degree: "B.S. in Computer Science",
-  graduation_year: 2027,
+  graduation_year: new Date().getFullYear() + 2,
   skills: [
     "Python",
     "TypeScript",
@@ -231,8 +231,8 @@ export const INITIAL_PROFILE: StudentProfile = {
   preferred_work_modes: ["Remote", "Hybrid"]
 };
 
-export const SAMPLE_RESUME_TEXT = `Alex Chen
-alex.chen@university.edu | (555) 234-5678 | Seattle, WA | github.com/alexchen | linkedin.com/in/alexchen-dev
+export const SAMPLE_RESUME_TEXT = `Student User
+student@university.edu | (555) 234-5678 | Seattle, WA | github.com/student-user | linkedin.com/in/student-user
 
 EDUCATION
 University of Washington, Seattle, WA

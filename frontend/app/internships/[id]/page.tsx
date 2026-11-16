@@ -26,6 +26,7 @@ import { InternshipFormModal } from "@/components/internships/internship-form-mo
 import { Internship } from "@/types";
 import { formatDate, getDaysRemaining } from "@/lib/utils";
 import { store } from "@/lib/storage";
+import { api } from "@/lib/api";
 import { toast } from "sonner";
 
 function InternshipDetailContent() {
@@ -55,7 +56,7 @@ function InternshipDetailContent() {
     return (
       <AppShell>
         <div className="py-20 text-center">
-          <p className="text-slate-400">Loading opportunity details...</p>
+          <p className="text-sm text-[#64748B]">Loading opportunity details...</p>
         </div>
       </AppShell>
     );
@@ -73,8 +74,17 @@ function InternshipDetailContent() {
   const toggleBookmark = async () => {
     const next = !isSaved;
     setIsSaved(next);
+    try {
+      if (next) {
+        await api.saveInternship(internship.id);
+      } else {
+        await api.unsaveInternship(internship.id);
+      }
+    } catch {
+      // offline fallback
+    }
     await store.updateInternship(internship.id, { is_saved: next });
-    toast.success(next ? "Saved to bookmarks" : "Removed from bookmarks");
+    toast.success(next ? "Saved to database bookmarks" : "Removed from bookmarks");
   };
 
   const handleApplyToPipeline = async () => {
@@ -101,10 +111,10 @@ function InternshipDetailContent() {
   return (
     <AppShell>
       {/* Back button */}
-      <div className="mb-6">
+      <div className="mb-5">
         <Link
           href="/internships"
-          className="inline-flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[#64748B] hover:text-[#0F172A] transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Back to Internships</span>
@@ -112,39 +122,39 @@ function InternshipDetailContent() {
       </div>
 
       {/* Main Header Card */}
-      <div className="p-6 md:p-8 rounded-3xl bg-[#111827] border border-slate-800 shadow-xl relative overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-800">
+      <div className="p-6 md:p-8 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm relative overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-[#E2E8F0]">
           <div className="flex items-start gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-[#4F7CFF] to-[#35D5F2] flex items-center justify-center font-bold text-xl text-white shadow-lg shrink-0">
+            <div className="h-16 w-16 rounded-xl bg-gradient-to-tr from-[#2563EB] to-[#38BDF8] flex items-center justify-center font-bold text-xl text-white shadow-sm shrink-0">
               {internship.company.slice(0, 2).toUpperCase()}
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-base font-bold text-[#4F7CFF]">
+                <span className="text-base font-bold text-[#2563EB]">
                   {internship.company}
                 </span>
                 <Badge variant="default">{internship.work_mode || "Remote"}</Badge>
                 {internship.is_demo && (
-                  <span className="text-[10px] text-slate-500 bg-slate-800 px-2 py-0.5 rounded font-mono">
+                  <span className="text-[10px] text-[#64748B] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded font-mono">
                     DEMO RECORD
                   </span>
                 )}
               </div>
-              <h1 className="text-2xl md:text-3xl font-extrabold text-white mt-1 tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-bold text-[#0F172A] mt-1 tracking-tight">
                 {internship.role}
               </h1>
-              <div className="flex items-center gap-4 text-xs text-slate-400 mt-2 flex-wrap">
+              <div className="flex items-center gap-4 text-xs text-[#64748B] mt-2 flex-wrap">
                 <span className="flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                  <MapPin className="h-3.5 w-3.5 text-[#64748B]" />
                   {internship.location || "Remote"}
                 </span>
                 <span>·</span>
-                <span className="text-emerald-400 font-medium">
+                <span className="text-[#16A34A] font-medium">
                   {internship.stipend || "Competitive compensation"}
                 </span>
                 <span>·</span>
                 <span className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-amber-400" />
+                  <Clock className="h-3.5 w-3.5 text-[#F59E0B]" />
                   Deadline: {formatDate(internship.deadline)}
                 </span>
                 <Badge variant={urgencyBadge}>{timing.label}</Badge>
@@ -153,47 +163,62 @@ function InternshipDetailContent() {
           </div>
 
           {/* Action CTAs */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={toggleBookmark}
-              className={`p-2.5 rounded-xl border transition-colors ${
+              className={`p-2 rounded-lg border transition-colors ${
                 isSaved
-                  ? "bg-[#4F7CFF]/20 border-[#4F7CFF]/50 text-[#4F7CFF]"
-                  : "bg-slate-800/80 border-slate-700 text-slate-400 hover:text-white"
+                  ? "bg-blue-50 border-blue-200 text-[#2563EB]"
+                  : "bg-white border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A]"
               }`}
               title={isSaved ? "Saved" : "Save to bookmarks"}
             >
-              <Bookmark className="h-5 w-5" fill={isSaved ? "currentColor" : "none"} />
+              <Bookmark className="h-4 w-4" fill={isSaved ? "currentColor" : "none"} />
             </button>
-            <Button variant="secondary" onClick={() => setIsEditOpen(true)}>
-              <Edit2 className="h-4 w-4 mr-1.5" />
+            <Button variant="secondary" size="sm" onClick={() => setIsEditOpen(true)}>
+              <Edit2 className="h-3.5 w-3.5 mr-1.5" />
               <span>Edit</span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setIsDeleteOpen(true)}
-              className="text-rose-400 hover:bg-rose-500/10"
+              className="text-[#DC2626] hover:bg-rose-50 hover:border-rose-200"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-3.5 w-3.5" />
             </Button>
-            <Button onClick={handleApplyToPipeline} className="glow-blue">
-              <Send className="h-4 w-4 mr-1.5" />
-              <span>Track in Pipeline</span>
-            </Button>
+            {internship.job_url ? (
+              <Button
+                size="sm"
+                onClick={() => {
+                  window.open(internship.job_url, "_blank", "noopener,noreferrer");
+                  handleApplyToPipeline();
+                }}
+                className="shadow-sm"
+              >
+                <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
+                <span>Apply on Official Portal</span>
+              </Button>
+            ) : (
+              <Button size="sm" onClick={handleApplyToPipeline} className="shadow-sm">
+                <Send className="h-3.5 w-3.5 mr-1.5" />
+                <span>Track in Pipeline</span>
+              </Button>
+            )}
           </div>
         </div>
 
         {/* AI Resume Match Quick Action Banner */}
-        <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-blue-600/15 via-[#35D5F2]/10 to-transparent border border-blue-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="mt-6 p-4 rounded-xl bg-blue-50/70 border border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-blue-500/20 text-[#35D5F2] flex items-center justify-center shrink-0">
+            <div className="h-9 w-9 rounded-lg bg-blue-100/80 text-[#2563EB] flex items-center justify-center shrink-0">
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-white">
+              <h4 className="text-xs sm:text-sm font-semibold text-[#0F172A]">
                 Benchmark Your Resume Against This Role
               </h4>
-              <p className="text-xs text-slate-400">
+              <p className="text-[11px] sm:text-xs text-[#64748B]">
                 Run an instant semantic skill gap analysis and receive tailored resume bullet recommendations.
               </p>
             </div>
@@ -207,8 +232,8 @@ function InternshipDetailContent() {
               (internship.required_skills || []).join(",")
             )}`}
           >
-            <Button size="sm" className="whitespace-nowrap glow-blue">
-              <FileCheck className="h-4 w-4 mr-1.5" />
+            <Button size="sm" className="whitespace-nowrap shadow-sm">
+              <FileCheck className="h-3.5 w-3.5 mr-1.5" />
               <span>Run AI Match Report</span>
             </Button>
           </Link>
@@ -219,8 +244,8 @@ function InternshipDetailContent() {
           <div className="md:col-span-2 space-y-6">
             {/* Description */}
             <div>
-              <h3 className="text-base font-bold text-white mb-2">Role Overview</h3>
-              <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+              <h3 className="text-sm font-semibold text-[#0F172A] mb-2 uppercase tracking-wide">Role Overview</h3>
+              <p className="text-sm text-[#0F172A]/80 leading-relaxed whitespace-pre-line">
                 {internship.description || "No overview provided."}
               </p>
             </div>
@@ -228,10 +253,10 @@ function InternshipDetailContent() {
             {/* Eligibility */}
             {internship.eligibility && (
               <div>
-                <h3 className="text-base font-bold text-white mb-2">
+                <h3 className="text-sm font-semibold text-[#0F172A] mb-2 uppercase tracking-wide">
                   Eligibility & Qualifications
                 </h3>
-                <p className="text-sm text-slate-300 leading-relaxed">
+                <p className="text-sm text-[#0F172A]/80 leading-relaxed">
                   {internship.eligibility}
                 </p>
               </div>
@@ -239,20 +264,20 @@ function InternshipDetailContent() {
 
             {/* Personal Notes */}
             {internship.notes && (
-              <div className="p-4 rounded-xl bg-slate-800/40 border border-slate-700/60">
-                <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                <h4 className="text-xs font-semibold text-[#64748B] uppercase tracking-wider mb-1">
                   Recruiting Notes & Insights
                 </h4>
-                <p className="text-sm text-white">{internship.notes}</p>
+                <p className="text-sm text-[#0F172A]">{internship.notes}</p>
               </div>
             )}
           </div>
 
           {/* Right Column: Skills & Links */}
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Required Skills */}
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">
+            <div className="p-5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-3">
                 Required Technical Skills
               </h3>
               <div className="flex flex-wrap gap-1.5">
@@ -266,8 +291,8 @@ function InternshipDetailContent() {
 
             {/* Preferred Skills */}
             {(internship.preferred_skills || []).length > 0 && (
-              <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">
+              <div className="p-5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-3">
                   Preferred / Bonus Skills
                 </h3>
                 <div className="flex flex-wrap gap-1.5">
@@ -282,12 +307,12 @@ function InternshipDetailContent() {
 
             {/* Official Link */}
             {internship.job_url && (
-              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
+              <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
                 <a
                   href={internship.job_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between text-xs text-[#4F7CFF] font-semibold hover:underline"
+                  className="flex items-center justify-between text-xs text-[#2563EB] font-semibold hover:underline"
                 >
                   <span>Official Careers Portal</span>
                   <ExternalLink className="h-4 w-4" />
@@ -329,7 +354,7 @@ function InternshipDetailContent() {
 
 export default function InternshipDetailPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-[#0B1020] text-slate-400 p-8 text-center">Loading opportunity details...</div>}>
+    <React.Suspense fallback={<div className="min-h-screen bg-[#F8FAFC] text-[#64748B] p-8 text-center text-sm">Loading opportunity details...</div>}>
       <InternshipDetailContent />
     </React.Suspense>
   );

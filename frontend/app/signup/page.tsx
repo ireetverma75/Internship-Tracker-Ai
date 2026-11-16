@@ -23,7 +23,7 @@ export default function SignUpPage() {
       setIsLoading(false);
       toast.success("Account created successfully (Demo Mode)");
       router.push("/dashboard");
-    }, 600);
+    }, 500);
   };
 
   const handleDemoBypass = () => {
@@ -32,29 +32,29 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1020] text-[#F8FAFC] flex flex-col justify-center items-center p-4">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-6">
+        <div className="text-center mb-5">
           <Link href="/" className="inline-flex items-center gap-2.5 mb-2">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-[#4F7CFF] to-[#35D5F2] flex items-center justify-center shadow-lg shadow-[#4F7CFF]/20">
+            <div className="h-10 w-10 rounded-xl bg-[#2563EB] flex items-center justify-center shadow-sm">
               <Briefcase className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-xl text-white">
-              Internship<span className="text-[#4F7CFF]">AI</span>
+            <span className="font-bold text-xl text-[#0F172A]">
+              Internship<span className="text-[#2563EB]">AI</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white tracking-tight">
+          <h1 className="text-2xl font-bold text-[#0F172A] tracking-tight">
             Create Student Account
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[#64748B] mt-1">
             Supercharge your tech internship application lifecycle
           </p>
         </div>
 
-        <div className="mb-5 p-3 rounded-xl bg-gradient-to-r from-blue-500/10 via-[#35D5F2]/10 to-blue-500/10 border border-blue-500/30 text-center">
+        <div className="mb-4 p-3.5 rounded-xl bg-blue-50/80 border border-blue-200 text-center shadow-sm">
           <Button
             onClick={handleDemoBypass}
-            className="w-full glow-blue"
+            className="w-full shadow-sm"
             size="sm"
           >
             <span>Skip to Academic Reviewer Demo</span>
@@ -62,23 +62,24 @@ export default function SignUpPage() {
           </Button>
         </div>
 
-        <div className="p-6 rounded-2xl bg-[#111827] border border-slate-700/80 shadow-2xl glass-card">
+        <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm">
           <form onSubmit={handleSignUp} className="space-y-3.5">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-[#0F172A] mb-1">
                 Full Name
               </label>
               <Input
                 type="text"
-                placeholder="Alex Chen"
+                placeholder="Student User"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
+                className="bg-[#F8FAFC]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-[#0F172A] mb-1">
                 University / Institution
               </label>
               <Input
@@ -86,24 +87,26 @@ export default function SignUpPage() {
                 placeholder="University of Washington"
                 value={university}
                 onChange={(e) => setUniversity(e.target.value)}
+                className="bg-[#F8FAFC]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-[#0F172A] mb-1">
                 Student Email
               </label>
               <Input
                 type="email"
-                placeholder="alex.chen@university.edu"
+                placeholder="student@university.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="bg-[#F8FAFC]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-[#0F172A] mb-1">
                 Password
               </label>
               <Input
@@ -112,29 +115,29 @@ export default function SignUpPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="bg-[#F8FAFC]"
               />
             </div>
 
             <Button
               type="submit"
-              variant="secondary"
-              className="w-full mt-2"
+              className="w-full mt-3 shadow-sm text-xs"
               isLoading={isLoading}
             >
-              Sign Up
+              Create Account
             </Button>
           </form>
 
-          <div className="mt-5 text-center text-xs text-slate-400">
+          <div className="mt-5 text-center text-xs text-[#64748B]">
             Already have an account?{" "}
-            <Link href="/login" className="text-[#4F7CFF] font-semibold hover:underline">
+            <Link href="/login" className="text-[#2563EB] font-semibold hover:underline">
               Sign in
             </Link>
           </div>
         </div>
 
-        <div className="mt-6 text-center text-xs text-slate-500">
-          <Link href="/" className="hover:text-slate-300">
+        <div className="mt-6 text-center text-xs text-[#64748B]">
+          <Link href="/" className="hover:text-[#0F172A] font-medium">
             ← Return to Homepage
           </Link>
         </div>

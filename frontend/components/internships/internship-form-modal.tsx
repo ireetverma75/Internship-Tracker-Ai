@@ -134,7 +134,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Company Name *
             </label>
             <Input
@@ -145,7 +145,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Role Title *
             </label>
             <Input
@@ -159,13 +159,13 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Work Mode
             </label>
             <select
               value={workMode}
               onChange={(e) => setWorkMode(e.target.value)}
-              className="flex h-10 w-full rounded-lg border border-slate-700/80 bg-[#111827] px-3 text-sm text-[#F8FAFC] focus:outline-none focus:border-[#4F7CFF]"
+              className="flex h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] shadow-2xs"
             >
               <option value="Remote">Remote</option>
               <option value="Hybrid">Hybrid</option>
@@ -173,7 +173,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Location
             </label>
             <Input
@@ -183,7 +183,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Stipend / Compensation
             </label>
             <Input
@@ -196,7 +196,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Application Deadline
             </label>
             <Input
@@ -206,7 +206,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Official Posting URL
             </label>
             <Input
@@ -219,7 +219,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
             Required Skills (comma separated)
           </label>
           <Input
@@ -230,7 +230,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
             Preferred Skills (comma separated)
           </label>
           <Input
@@ -241,7 +241,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
             Eligibility Requirements
           </label>
           <Input
@@ -252,7 +252,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
             Job Description & Overview
           </label>
           <Textarea
@@ -264,7 +264,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
             Personal Notes & Interview Tips
           </label>
           <Input
@@ -274,7 +274,7 @@ export const InternshipFormModal: React.FC<InternshipFormModalProps> = ({
           />
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>

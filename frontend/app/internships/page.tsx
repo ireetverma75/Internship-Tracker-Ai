@@ -11,8 +11,11 @@ import {
   List,
   Bookmark,
   ArrowUpDown,
-  Sparkles
+  Sparkles,
+  Database,
+  ArrowRight
 } from "lucide-react";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { InternshipCard } from "@/components/internships/internship-card";
 import { InternshipFormModal } from "@/components/internships/internship-form-modal";
@@ -26,11 +29,12 @@ import { toast } from "sonner";
 function InternshipsContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("query") || "";
+  const initialSaved = searchParams.get("saved") === "true";
 
   const [internships, setInternships] = useState<Internship[]>([]);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [workModeFilter, setWorkModeFilter] = useState<string>("All");
-  const [savedOnly, setSavedOnly] = useState(false);
+  const [savedOnly, setSavedOnly] = useState(initialSaved);
   const [sortBy, setSortBy] = useState<"deadline" | "newest" | "company">("deadline");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
@@ -55,6 +59,12 @@ function InternshipsContent() {
       setSearchQuery(initialQuery);
     }
   }, [initialQuery]);
+
+  useEffect(() => {
+    if (searchParams.get("saved") === "true") {
+      setSavedOnly(true);
+    }
+  }, [searchParams]);
 
   // Filter & Sort
   const filteredInternships = useMemo(() => {
@@ -122,14 +132,14 @@ function InternshipsContent() {
   return (
     <AppShell>
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#E2E8F0]">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-            <Compass className="h-7 w-7 text-[#4F7CFF]" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight flex items-center gap-2.5">
+            <Compass className="h-7 w-7 text-[#2563EB]" />
             <span>Discover Tech Internships</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Curated software engineering, AI/ML, and design internships with verified requirements.
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1">
+            Curated software engineering, AI/ML, and design internships with verified criteria and AI matching.
           </p>
         </div>
 
@@ -138,38 +148,67 @@ function InternshipsContent() {
             setEditingItem(null);
             setIsFormOpen(true);
           }}
-          className="glow-blue self-start md:self-auto"
+          className="self-start md:self-auto shadow-sm"
         >
           <Plus className="h-4 w-4 mr-1.5" />
           <span>Add Opportunity</span>
         </Button>
       </div>
 
+      {/* Hugging Face Jobs Dataset Discovery Banner */}
+      <div className="mt-5 p-4 rounded-xl border border-[#E2E8F0] bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm hover:border-[#38BDF8]/60 transition-colors">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-lg bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">
+            <Database className="h-5 w-5 text-[#38BDF8]" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h4 className="text-xs sm:text-sm font-semibold text-[#0F172A]">
+                Looking for 390+ Hugging Face Dataset Jobs?
+              </h4>
+              <span className="text-[10px] font-semibold text-[#2563EB] bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">
+                AI Dataset
+              </span>
+            </div>
+            <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5">
+              Explore real-world listings and synthetic records with calculated TF-IDF semantic resume matching.
+            </p>
+          </div>
+        </div>
+        <Link
+          href="/jobs"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition-colors self-start sm:self-auto shrink-0 shadow-sm"
+        >
+          <span>Explore HF Jobs</span>
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+
       {/* Filter and Search Bar */}
-      <div className="mt-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-[#111827] p-4 rounded-2xl border border-slate-800 shadow-md">
+      <div className="mt-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E2E8F0] shadow-sm">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by role, company, or skill (e.g. Python, PyTorch, React)..."
-            className="pl-10 h-10 bg-slate-900 border-slate-700/80"
+            className="pl-10 h-9 bg-[#F8FAFC] border-[#E2E8F0] text-xs focus:bg-white"
           />
         </div>
 
         {/* Filter Badges & Controls */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Work Mode filter */}
-          <div className="flex items-center rounded-lg bg-slate-900 p-1 border border-slate-800 text-xs">
+          <div className="flex items-center rounded-lg bg-[#F8FAFC] p-1 border border-[#E2E8F0] text-xs">
             {["All", "Remote", "Hybrid", "On-site"].map((mode) => (
               <button
                 key={mode}
                 onClick={() => setWorkModeFilter(mode)}
-                className={`px-2.5 py-1 rounded-md transition-colors font-medium ${
+                className={`px-2.5 py-1 rounded-md transition-all font-medium ${
                   workModeFilter === mode
-                    ? "bg-[#4F7CFF] text-white"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-[#2563EB] text-white shadow-sm"
+                    : "text-[#64748B] hover:text-[#0F172A]"
                 }`}
               >
                 {mode}
@@ -180,10 +219,10 @@ function InternshipsContent() {
           {/* Saved Toggle */}
           <button
             onClick={() => setSavedOnly(!savedOnly)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
               savedOnly
-                ? "bg-[#4F7CFF]/20 border-[#4F7CFF]/50 text-[#4F7CFF]"
-                : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                ? "bg-blue-50 border-blue-200 text-[#2563EB]"
+                : "bg-white border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A]"
             }`}
           >
             <Bookmark className="h-3.5 w-3.5" fill={savedOnly ? "currentColor" : "none"} />
@@ -194,7 +233,7 @@ function InternshipsContent() {
           <select
             value={sortBy}
             onChange={(e: any) => setSortBy(e.target.value)}
-            className="h-9 px-2.5 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300 focus:outline-none focus:border-[#4F7CFF]"
+            className="h-8 px-2.5 rounded-lg bg-white border border-[#E2E8F0] text-xs text-[#0F172A] font-medium focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
           >
             <option value="deadline">Sort: Deadline Soonest</option>
             <option value="newest">Sort: Newest Added</option>
@@ -202,42 +241,42 @@ function InternshipsContent() {
           </select>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center rounded-lg bg-slate-900 p-1 border border-slate-800">
+          <div className="flex items-center rounded-lg bg-[#F8FAFC] p-1 border border-[#E2E8F0]">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-1.5 rounded-md transition-colors ${
+              className={`p-1 rounded-md transition-colors ${
                 viewMode === "grid"
-                  ? "bg-slate-800 text-white"
-                  : "text-slate-500 hover:text-slate-300"
+                  ? "bg-white text-[#0F172A] shadow-sm"
+                  : "text-[#64748B] hover:text-[#0F172A]"
               }`}
               title="Grid view"
             >
-              <LayoutGrid className="h-4 w-4" />
+              <LayoutGrid className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded-md transition-colors ${
+              className={`p-1 rounded-md transition-colors ${
                 viewMode === "list"
-                  ? "bg-slate-800 text-white"
-                  : "text-slate-500 hover:text-slate-300"
+                  ? "bg-white text-[#0F172A] shadow-sm"
+                  : "text-[#64748B] hover:text-[#0F172A]"
               }`}
               title="List view"
             >
-              <List className="h-4 w-4" />
+              <List className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
       </div>
 
       {/* Results Count Bar */}
-      <div className="flex items-center justify-between text-xs text-slate-400 mt-4 px-1">
+      <div className="flex items-center justify-between text-xs text-[#64748B] mt-4 px-1">
         <span>
-          Showing <strong className="text-white">{filteredInternships.length}</strong> opportunities
+          Showing <strong className="text-[#0F172A] font-semibold">{filteredInternships.length}</strong> opportunities
         </span>
         {searchQuery && (
           <button
             onClick={() => setSearchQuery("")}
-            className="text-[#4F7CFF] hover:underline"
+            className="text-[#2563EB] font-medium hover:underline"
           >
             Clear search
           </button>
@@ -246,13 +285,15 @@ function InternshipsContent() {
 
       {/* Internships List / Grid */}
       {filteredInternships.length === 0 ? (
-        <div className="mt-12 text-center p-12 rounded-2xl bg-[#111827] border border-slate-800 max-w-md mx-auto">
-          <Compass className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-white">No opportunities found</h3>
-          <p className="text-xs text-slate-400 mt-1">
+        <div className="mt-10 text-center p-12 rounded-2xl bg-white border border-[#E2E8F0] max-w-md mx-auto shadow-sm">
+          <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-3 text-[#64748B]">
+            <Compass className="h-6 w-6" />
+          </div>
+          <h3 className="text-base font-semibold text-[#0F172A]">No opportunities found</h3>
+          <p className="text-xs text-[#64748B] mt-1">
             No internships match your current filters or search query.
           </p>
-          <div className="mt-4 flex items-center justify-center gap-3">
+          <div className="mt-5 flex items-center justify-center gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -333,7 +374,7 @@ function InternshipsContent() {
 
 export default function InternshipsPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-[#0B1020] text-slate-400 p-8 text-center">Loading opportunities...</div>}>
+    <React.Suspense fallback={<div className="min-h-screen bg-[#F8FAFC] text-[#64748B] p-8 text-center text-sm">Loading opportunities...</div>}>
       <InternshipsContent />
     </React.Suspense>
   );

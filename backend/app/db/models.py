@@ -90,3 +90,19 @@ class Application(Base):
     external_url: Mapped[str | None] = mapped_column(String(500))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class Job(Base):
+    __tablename__ = "jobs"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=gen_uuid)
+    job_title: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    company: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    job_type: Mapped[str | None] = mapped_column(String(100), index=True)
+    description: Mapped[str | None] = mapped_column(Text)
+    qualifications: Mapped[str | None] = mapped_column(Text)
+    duties: Mapped[str | None] = mapped_column(Text)
+    pay: Mapped[str | None] = mapped_column(String(100))
+    source: Mapped[str] = mapped_column(String(100), default="huggingface_jobs_dataset")
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
+import { GlobalAuroraBackground } from "@/components/layout/GlobalAuroraBackground";
+import { GlassPointerLight } from "@/components/layout/GlassPointerLight";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,17 +23,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="antialiased bg-[#0B1020] text-[#F8FAFC]">
-        {children}
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className="liquid-glass-theme antialiased bg-[#050816] text-[#F8FAFC] selection:bg-[#60A5FA] selection:text-white">
+        <GlobalAuroraBackground />
+        <GlassPointerLight />
+        <div className="relative z-10 min-h-screen">
+          {children}
+        </div>
         <Toaster
           position="top-right"
           theme="dark"
           toastOptions={{
             style: {
-              background: "#111827",
-              border: "1px solid #1E293B",
-              color: "#F8FAFC"
+              background: "rgba(12, 18, 38, 0.82)",
+              backdropFilter: "blur(24px) saturate(160%)",
+              border: "1px solid rgba(255, 255, 255, 0.16)",
+              color: "#F8FAFC",
+              boxShadow: "0 20px 45px rgba(15, 23, 42, 0.45)"
             }
           }}
         />

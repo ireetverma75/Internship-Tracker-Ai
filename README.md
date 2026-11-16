@@ -19,6 +19,7 @@
 3. **Objective Resume–Job Matcher:** Benchmark candidate PDF resumes against job requirements using transparent, evidence-based scoring (70% required skills, 20% preferred skills, 10% academic/project baseline) rather than black-box claims.
 4. **Interactive Kanban Pipeline:** Move applications seamlessly through 6 recruiting stages: *Saved*, *Applied*, *Assessment*, *Interview*, *Selected*, and *Rejected*.
 5. **Urgency Deadline Management:** Chronological timeline tracking overdue, closing soon, and upcoming deadlines with days-remaining countdowns.
+6. **Hugging Face Jobs Tabular Dataset Integration (`priyaagarwal19/Jobs-tabular-dataset`):** Ingestion and caching of 391 real-world sample listings and 1,600 synthetic records with scikit-learn TF-IDF vectorization, Cosine Similarity scoring, NLP skill extraction, and automated skill-gap recommendations.
 
 ---
 

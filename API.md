@@ -242,6 +242,101 @@ Response 200:
 
 ---
 
+## Hugging Face Dataset Jobs
+
+### GET /jobs
+Query params: `query`, `job_title`, `company`, `job_type`, `skill`, `is_synthetic`, `page` (default 1), `limit` (default 20).  
+Returns paginated list of jobs from the Hugging Face Jobs Tabular Dataset with extracted skills.  
+Response 200:
+```json
+{
+  "total": 391,
+  "page": 1,
+  "limit": 20,
+  "total_pages": 20,
+  "jobs": [
+    {
+      "id": "uuid",
+      "job_title": "Mechanical Engineer",
+      "company": "Lawrence Livermore National Laboratory",
+      "job_type": "Engineering",
+      "description": "...",
+      "qualifications": "...",
+      "duties": "...",
+      "pay": "$140,700 - $214,032",
+      "source": "huggingface_jobs_dataset",
+      "is_synthetic": false,
+      "created_at": "2026-11-05T...",
+      "skills": ["System Design", "Linux"]
+    }
+  ],
+  "job_types": ["Consulting", "Engineering", "Software Development"],
+  "companies": ["Lawrence Livermore National Laboratory", ...]
+}
+```
+
+### GET /jobs/{id}
+Returns specific job by ID with extracted skills.  
+Response 200: JobResponse object.  
+Errors: 404 `NOT_FOUND`
+
+### GET /jobs/stats
+Returns dataset metrics: total jobs, real-world sample count, synthetic records count, and top categories.
+
+### POST /jobs/sync
+Triggers Hugging Face dataset synchronization.  
+Query params: `split` ("original" | "augmented" | "all"), `max_records` (optional).  
+Response 200: Sync summary with counts of inserted, skipped, and duplicates removed.
+
+---
+
+## AI Resume Matching & Recommendations
+
+### POST /matching/match-job
+Matches an uploaded PDF resume or resume text against a specific dataset job using TF-IDF vectorization and Cosine Similarity.  
+Content-Type: `multipart/form-data`  
+Form fields: `job_id` (required), `file` (PDF, optional), `resume_text` (optional).  
+Response 200:
+```json
+{
+  "extracted_candidate_skills": ["Python", "SQL", "Flask"],
+  "total_skills_detected": 3,
+  "match_result": {
+    "job_id": "uuid",
+    "job_title": "Python Developer Intern",
+    "company": "TechCorp",
+    "job_type": "Software Development",
+    "pay": "$95,000 - $110,000",
+    "is_synthetic": false,
+    "match_score": 85.0,
+    "tfidf_similarity": 0.38,
+    "skill_overlap_ratio": 0.60,
+    "matched_skills": ["Flask", "Python", "SQL"],
+    "missing_skills": ["AWS", "Docker"],
+    "recommendation": "Improve your Docker and AWS knowledge to strengthen your profile for this Python Developer Intern listing.",
+    "qualification_match": "Candidate holds B.Tech, which aligns with undergraduate degree requirements."
+  }
+}
+```
+
+### POST /matching/match-text
+Ad-hoc match of resume text directly against an arbitrary job description.  
+Body: JSON `{ "resume_text": "...", "job_title": "...", "company": "...", "job_description": "...", "qualifications": "...", "duties": "..." }`  
+Response 200: `JobMatchResult`
+
+### POST /matching/batch-match
+Evaluates an uploaded resume against all jobs in the database and returns ranked results.
+
+### POST /recommendations/jobs
+Ranks and recommends top matching jobs for an uploaded resume.  
+Form fields: `file` (PDF, optional), `resume_text` (optional), `top_n` (default 10), `job_type` (optional), `include_synthetic` (default false).  
+Response 200: List of recommended jobs with calculated scores and skill gaps.
+
+### GET /recommendations/profile-based
+Recommends jobs using saved profile skills and education.
+
+---
+
 ## Error Codes Reference
 
 | Code | HTTP | Meaning |

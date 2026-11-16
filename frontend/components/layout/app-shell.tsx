@@ -16,9 +16,9 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#0B1020] text-[#F8FAFC] flex flex-col font-sans">
+    <div className="app-shell min-h-screen bg-transparent text-slate-100 flex flex-col font-sans">
       <DemoBanner />
-      <div className="flex flex-1 w-full">
+      <div className="flex flex-1 w-full max-w-[1720px] mx-auto px-2 md:px-4 lg:px-6 gap-3">
         {/* Desktop Sidebar */}
         <Sidebar />
 
@@ -29,13 +29,13 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         />
 
         {/* Main Content Viewport */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 bg-transparent">
           <TopNavbar
             onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
             onOpenAddModal={() => setIsAddModalOpen(true)}
           />
 
-          <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl w-full mx-auto animate-in fade-in duration-200">
+          <main className="app-main flex-1 p-4 md:p-6 lg:p-8 w-full mx-auto animate-in fade-in duration-150">
             {children}
           </main>
         </div>

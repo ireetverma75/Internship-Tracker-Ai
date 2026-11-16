@@ -203,6 +203,27 @@ CREATE INDEX idx_applications_status ON applications(user_id, status);
 CREATE INDEX idx_applications_deadline ON applications(user_id, deadline) WHERE deadline IS NOT NULL;
 ```
 
+### jobs (Hugging Face Jobs Tabular Dataset)
+```sql
+CREATE TABLE jobs (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  job_title       TEXT NOT NULL,
+  company         TEXT NOT NULL,
+  job_type        TEXT,
+  description     TEXT,
+  qualifications  TEXT,
+  duties          TEXT,
+  pay             TEXT,
+  source          TEXT DEFAULT 'huggingface_jobs_dataset',
+  is_synthetic    BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_jobs_job_title ON jobs(job_title);
+CREATE INDEX idx_jobs_company ON jobs(company);
+CREATE INDEX idx_jobs_job_type ON jobs(job_type);
+CREATE INDEX idx_jobs_is_synthetic ON jobs(is_synthetic);
+```
+
 ---
 
 ## 3. Row Level Security Policies

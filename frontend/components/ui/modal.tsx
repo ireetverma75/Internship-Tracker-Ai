@@ -54,37 +54,37 @@ export const Modal: React.FC<ModalProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-[#0B1020]/80 backdrop-blur-md"
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs"
           />
 
           {/* Modal Box */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+            initial={{ opacity: 0, scale: 0.97, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 15 }}
-            transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: 10 }}
+            transition={{ type: "spring", duration: 0.25, bounce: 0 }}
             className={cn(
-              "relative w-full rounded-2xl border border-slate-700/80 bg-[#111827] p-6 shadow-2xl text-[#F8FAFC] z-10 my-8",
+              "relative w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl text-[#0F172A] z-10 my-8",
               maxW[maxWidth]
             )}
           >
-            <div className="flex items-start justify-between pb-4 border-b border-slate-800">
+            <div className="flex items-start justify-between pb-4 border-b border-slate-100">
               <div>
                 {title && (
-                  <h3 className="text-lg font-semibold text-[#F8FAFC]">
+                  <h3 className="text-base font-semibold text-[#0F172A]">
                     {title}
                   </h3>
                 )}
                 {description && (
-                  <p className="text-xs text-slate-400 mt-1">{description}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{description}</p>
                 )}
               </div>
               <button
                 onClick={onClose}
-                className="rounded-lg p-1 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                className="rounded-lg p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                 aria-label="Close modal"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 

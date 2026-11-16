@@ -22,32 +22,33 @@ export const ApplicationsBarChart: React.FC<ApplicationsBarChartProps> = ({
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
           <XAxis
             dataKey="month"
-            stroke="#64748B"
+            stroke="#94A3B8"
             fontSize={11}
             tickLine={false}
-            axisLine={{ stroke: "#1E293B" }}
+            axisLine={{ stroke: "#E2E8F0" }}
           />
           <YAxis
-            stroke="#64748B"
+            stroke="#94A3B8"
             fontSize={11}
             tickLine={false}
-            axisLine={{ stroke: "#1E293B" }}
+            axisLine={{ stroke: "#E2E8F0" }}
             allowDecimals={false}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "#111827",
-              borderColor: "#1E293B",
+              backgroundColor: "#FFFFFF",
+              borderColor: "#E2E8F0",
               borderRadius: "0.5rem",
-              color: "#F8FAFC",
-              fontSize: "12px"
+              color: "#0F172A",
+              fontSize: "12px",
+              boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.08)"
             }}
           />
-          <Bar dataKey="applications" name="Applications" fill="#4F7CFF" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="interviews" name="Interviews" fill="#35D5F2" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="applications" name="Applications" fill="#2563EB" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="interviews" name="Interviews" fill="#38BDF8" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

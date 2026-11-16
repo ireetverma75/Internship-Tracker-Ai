@@ -3,7 +3,6 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface DrawerProps {
   isOpen: boolean;
@@ -44,7 +43,7 @@ export const Drawer: React.FC<DrawerProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-[#0B1020]/75 backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"
           />
 
           {/* Drawer Body */}
@@ -53,22 +52,22 @@ export const Drawer: React.FC<DrawerProps> = ({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 250 }}
-            className="relative w-full max-w-md md:max-w-xl h-full bg-[#111827] border-l border-slate-800 p-6 shadow-2xl flex flex-col text-[#F8FAFC] z-10"
+            className="relative w-full max-w-md md:max-w-xl h-full bg-white border-l border-[#E2E8F0] p-6 shadow-2xl flex flex-col text-[#0F172A] z-10"
           >
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-4 border-b border-[#E2E8F0]">
               <div>
                 {title && (
-                  <h3 className="text-lg font-semibold text-[#F8FAFC]">
+                  <h3 className="text-base font-bold text-[#0F172A]">
                     {title}
                   </h3>
                 )}
                 {description && (
-                  <p className="text-xs text-slate-400 mt-0.5">{description}</p>
+                  <p className="text-xs text-[#64748B] mt-0.5">{description}</p>
                 )}
               </div>
               <button
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                className="rounded-lg p-1 text-[#64748B] hover:text-[#0F172A] hover:bg-slate-100 transition-colors"
                 aria-label="Close drawer"
               >
                 <X className="h-5 w-5" />

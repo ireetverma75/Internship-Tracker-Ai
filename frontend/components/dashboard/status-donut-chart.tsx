@@ -17,11 +17,11 @@ interface StatusDonutChartProps {
 
 const COLOR_MAP: Record<ApplicationStatus, string> = {
   Saved: "#64748B",       // Slate
-  Applied: "#4F7CFF",     // Electric Blue
-  Assessment: "#F59E0B",  // Amber
-  Interview: "#35D5F2",   // Cyan
-  Selected: "#10B981",    // Emerald
-  Rejected: "#EF4444"     // Rose Red
+  Applied: "#2563EB",     // Primary Blue
+  Assessment: "#F59E0B",  // Warning Amber
+  Interview: "#38BDF8",   // Secondary Blue
+  Selected: "#16A34A",    // Success Green
+  Rejected: "#DC2626"     // Danger Red
 };
 
 export const StatusDonutChart: React.FC<StatusDonutChartProps> = ({
@@ -32,16 +32,16 @@ export const StatusDonutChart: React.FC<StatusDonutChartProps> = ({
     .map(([status, count]) => ({
       name: status,
       value: count,
-      color: COLOR_MAP[status as ApplicationStatus] || "#4F7CFF"
+      color: COLOR_MAP[status as ApplicationStatus] || "#2563EB"
     }));
 
   const total = Object.values(statusCounts).reduce((a, b) => a + b, 0);
 
   if (total === 0) {
     return (
-      <div className="h-64 flex flex-col items-center justify-center text-slate-500 text-xs">
+      <div className="h-64 flex flex-col items-center justify-center text-slate-400 text-xs">
         <p>No applications logged yet</p>
-        <p className="text-[11px] mt-1 text-slate-600">
+        <p className="text-[11px] mt-1 text-slate-500">
           Add an application to see pipeline distribution
         </p>
       </div>
@@ -62,16 +62,17 @@ export const StatusDonutChart: React.FC<StatusDonutChartProps> = ({
             dataKey="value"
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} stroke="#111827" strokeWidth={2} />
+              <Cell key={`cell-${index}`} fill={entry.color} stroke="#FFFFFF" strokeWidth={2} />
             ))}
           </Pie>
           <Tooltip
             contentStyle={{
-              backgroundColor: "#111827",
-              borderColor: "#1E293B",
+              backgroundColor: "#FFFFFF",
+              borderColor: "#E2E8F0",
               borderRadius: "0.5rem",
-              color: "#F8FAFC",
-              fontSize: "12px"
+              color: "#0F172A",
+              fontSize: "12px",
+              boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.08)"
             }}
             formatter={(value: any, name: any) => [`${value} applications`, name]}
           />
@@ -79,15 +80,15 @@ export const StatusDonutChart: React.FC<StatusDonutChartProps> = ({
             verticalAlign="bottom"
             height={36}
             iconType="circle"
-            wrapperStyle={{ fontSize: "11px", color: "#94A3B8" }}
+            wrapperStyle={{ fontSize: "11px", color: "#64748B" }}
           />
         </PieChart>
       </ResponsiveContainer>
 
       {/* Center Statistic */}
       <div className="absolute top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-        <span className="text-2xl font-bold text-white tabular-nums">{total}</span>
-        <span className="block text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+        <span className="text-2xl font-bold text-[#0F172A] tabular-nums">{total}</span>
+        <span className="block text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
           Total
         </span>
       </div>

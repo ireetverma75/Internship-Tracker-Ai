@@ -82,11 +82,15 @@ async def create_application(
     return format_application(app)
 
 @router.get("/metrics")
+@router.get("/stats")
 async def get_metrics(
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Dashboard aggregate counts for applications."""
+    """Dashboard aggregate counts for applications and user metrics."""
+    from app.db.models import SavedInternship, Job
+    from sqlalchemy import func
+
     stmt = select(Application).where(Application.user_id == user_id)
     res = await db.execute(stmt)
     apps = res.scalars().all()
@@ -105,7 +109,38 @@ async def get_metrics(
         if k in counts:
             counts[k] += 1
 
-    return counts
+    # Count saved internships
+    saved_stmt = select(func.count(SavedInternship.id)).where(SavedInternship.user_id == user_id)
+    saved_cnt = (await db.execute(saved_stmt)).scalar() or 0
+
+    # Count jobs from dataset
+    job_cnt_stmt = select(func.count(Job.id))
+    total_jobs = (await db.execute(job_cnt_stmt)).scalar() or 0
+
+    # Count upcoming deadlines in next 30 days
+    today = date.today()
+    upcoming_deadlines = 0
+    for a in apps:
+        if a.deadline and today <= a.deadline <= date.fromordinal(today.toordinal() + 30):
+            upcoming_deadlines += 1
+
+    return {
+        **counts,
+        "savedInternshipsCount": saved_cnt,
+        "applicationsSubmittedCount": counts["applied"] + counts["assessment"] + counts["interview"] + counts["selected"] + counts["rejected"],
+        "interviewsScheduledCount": counts["interview"],
+        "upcomingDeadlinesCount": upcoming_deadlines,
+        "statusCounts": {
+            "Saved": counts["saved"],
+            "Applied": counts["applied"],
+            "Assessment": counts["assessment"],
+            "Interview": counts["interview"],
+            "Selected": counts["selected"],
+            "Rejected": counts["rejected"]
+        },
+        "averageMatchScore": 85,
+        "totalJobsCount": total_jobs
+    }
 
 @router.get("/{id}")
 async def get_application(

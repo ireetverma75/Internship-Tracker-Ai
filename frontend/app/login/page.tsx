@@ -21,7 +21,7 @@ export default function LoginPage() {
       setIsLoading(false);
       toast.success("Signed in successfully (Demo Session)");
       router.push("/dashboard");
-    }, 600);
+    }, 500);
   };
 
   const handleDemoBypass = () => {
@@ -30,42 +30,37 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1020] text-[#F8FAFC] flex flex-col justify-center items-center p-4">
-      {/* Background glow */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#4F7CFF]/15 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <Link href="/" className="inline-flex items-center gap-2.5 mb-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-[#4F7CFF] to-[#35D5F2] flex items-center justify-center shadow-lg shadow-[#4F7CFF]/20">
+            <div className="h-10 w-10 rounded-xl bg-[#2563EB] flex items-center justify-center shadow-sm">
               <Briefcase className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-xl text-white">
-              Internship<span className="text-[#4F7CFF]">AI</span>
+            <span className="font-bold text-xl text-[#0F172A]">
+              Internship<span className="text-[#2563EB]">AI</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white tracking-tight">
+          <h1 className="text-2xl font-bold text-[#0F172A] tracking-tight">
             Welcome Back
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[#64748B] mt-1">
             Access your internship tracker and resume matching dashboard
           </p>
         </div>
 
         {/* Demo Fast Access Pill */}
-        <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-blue-500/10 via-[#35D5F2]/10 to-blue-500/10 border border-blue-500/30 text-center">
-          <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-[#35D5F2] mb-1">
+        <div className="mb-5 p-4 rounded-xl bg-blue-50/80 border border-blue-200 text-center shadow-sm">
+          <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[#2563EB] mb-1">
             <Sparkles className="h-4 w-4" />
             <span>Academic Reviewer One-Click Access</span>
           </div>
-          <p className="text-[11px] text-slate-400 mb-3">
+          <p className="text-[11px] text-[#64748B] mb-3">
             Evaluate all features with preloaded opportunities and applications without creating an account.
           </p>
           <Button
             onClick={handleDemoBypass}
-            className="w-full glow-blue"
+            className="w-full shadow-sm"
             size="sm"
           >
             <span>Enter as Demo Reviewer</span>
@@ -73,26 +68,27 @@ export default function LoginPage() {
           </Button>
         </div>
 
-        <div className="p-6 rounded-2xl bg-[#111827] border border-slate-700/80 shadow-2xl glass-card">
+        <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm">
           <form onSubmit={handleSignIn} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-[#0F172A] mb-1">
                 Email Address
               </label>
               <Input
                 type="email"
-                placeholder="alex.chen@university.edu"
+                placeholder="student@university.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="bg-[#F8FAFC]"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-medium text-slate-300">
+                <label className="block text-xs font-semibold text-[#0F172A]">
                   Password
                 </label>
-                <a href="#" className="text-[11px] text-[#4F7CFF] hover:underline">
+                <a href="#" className="text-[11px] text-[#2563EB] font-medium hover:underline">
                   Forgot?
                 </a>
               </div>
@@ -101,29 +97,30 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="bg-[#F8FAFC]"
               />
             </div>
 
             <Button
               type="submit"
               variant="secondary"
-              className="w-full mt-2"
+              className="w-full mt-2 text-xs"
               isLoading={isLoading}
             >
               Sign In with Credentials
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-xs text-slate-400">
+          <div className="mt-5 text-center text-xs text-[#64748B]">
             Don't have an account?{" "}
-            <Link href="/signup" className="text-[#4F7CFF] font-semibold hover:underline">
+            <Link href="/signup" className="text-[#2563EB] font-semibold hover:underline">
               Sign up
             </Link>
           </div>
         </div>
 
-        <div className="mt-8 text-center text-xs text-slate-500">
-          <Link href="/" className="hover:text-slate-300">
+        <div className="mt-6 text-center text-xs text-[#64748B]">
+          <Link href="/" className="hover:text-[#0F172A] font-medium">
             ← Return to Homepage
           </Link>
         </div>

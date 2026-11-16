@@ -83,48 +83,46 @@ export default function DeadlinesPage() {
   return (
     <AppShell>
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#E2E8F0]">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-            <Clock className="h-7 w-7 text-amber-400" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight flex items-center gap-2.5">
+            <Clock className="h-7 w-7 text-[#2563EB]" />
             <span>Deadlines & Milestones</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1">
             Chronological timeline and urgency countdowns for all active applications and saved opportunities.
           </p>
         </div>
 
         {/* Quick Filter Tabs */}
-        <div className="flex items-center rounded-xl bg-[#111827] p-1 border border-slate-800 self-start md:self-auto text-xs font-semibold">
+        <div className="flex items-center rounded-xl bg-white p-1 border border-[#E2E8F0] shadow-sm self-start md:self-auto text-xs font-semibold">
           <button
             onClick={() => setFilterMode("all")}
-            className={`px-3 py-1.5 rounded-lg transition-colors ${
+            className={`px-3 py-1.5 rounded-lg transition-all ${
               filterMode === "all"
-                ? "bg-[#4F7CFF] text-white"
-                : "text-slate-400 hover:text-white"
+                ? "bg-[#2563EB] text-white shadow-sm"
+                : "text-[#64748B] hover:text-[#0F172A]"
             }`}
           >
             All Deadlines ({deadlineItems.length})
           </button>
           <button
             onClick={() => setFilterMode("closing_soon")}
-            className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
               filterMode === "closing_soon"
-                ? "bg-amber-500 text-[#0B1020]"
-                : "text-amber-400 hover:text-amber-300"
+                ? "bg-[#F59E0B] text-white shadow-sm"
+                : "text-[#F59E0B] hover:bg-amber-50"
             }`}
           >
-            <span>Closing Soon</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-            <span>({closingSoonList.length})</span>
+            <span>Closing Soon ({closingSoonList.length})</span>
           </button>
           {overdueList.length > 0 && (
             <button
               onClick={() => setFilterMode("overdue")}
-              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
                 filterMode === "overdue"
-                  ? "bg-rose-600 text-white"
-                  : "text-rose-400 hover:text-rose-300"
+                  ? "bg-[#DC2626] text-white shadow-sm"
+                  : "text-[#DC2626] hover:bg-rose-50"
               }`}
             >
               <span>Overdue ({overdueList.length})</span>
@@ -135,45 +133,51 @@ export default function DeadlinesPage() {
 
       {/* Summary Urgency Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-between">
+        <div className="p-5 rounded-2xl bg-white border border-amber-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-amber-400">Due Within 7 Days</span>
-            <p className="text-2xl font-extrabold text-white mt-1 tabular-nums">
+            <span className="text-xs font-bold text-[#F59E0B] uppercase tracking-wider">Due Within 7 Days</span>
+            <p className="text-2xl font-extrabold text-[#0F172A] mt-1 tabular-nums">
               {closingSoonList.length}
             </p>
           </div>
-          <AlertTriangle className="h-8 w-8 text-amber-400/80" />
+          <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center text-[#F59E0B]">
+            <AlertTriangle className="h-5 w-5" />
+          </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-between">
+        <div className="p-5 rounded-2xl bg-white border border-blue-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-[#4F7CFF]">Upcoming Later (8+ Days)</span>
-            <p className="text-2xl font-extrabold text-white mt-1 tabular-nums">
+            <span className="text-xs font-bold text-[#2563EB] uppercase tracking-wider">Upcoming Later (8+ Days)</span>
+            <p className="text-2xl font-extrabold text-[#0F172A] mt-1 tabular-nums">
               {upcomingList.length}
             </p>
           </div>
-          <Calendar className="h-8 w-8 text-[#4F7CFF]/80" />
+          <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#2563EB]">
+            <Calendar className="h-5 w-5" />
+          </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+        <div className="p-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-slate-400">Total Monitored Deadlines</span>
-            <p className="text-2xl font-extrabold text-white mt-1 tabular-nums">
+            <span className="text-xs font-bold text-[#64748B] uppercase tracking-wider">Total Monitored Deadlines</span>
+            <p className="text-2xl font-extrabold text-[#0F172A] mt-1 tabular-nums">
               {deadlineItems.length}
             </p>
           </div>
-          <Clock className="h-8 w-8 text-slate-600" />
+          <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-[#64748B]">
+            <Clock className="h-5 w-5" />
+          </div>
         </div>
       </div>
 
       {/* Chronological List */}
-      <div className="mt-8 space-y-4">
+      <div className="mt-6 space-y-3.5">
         {displayedItems.length === 0 ? (
-          <div className="p-12 rounded-2xl bg-[#111827] border border-slate-800 text-center max-w-md mx-auto my-8">
-            <Clock className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-white">No deadlines in this view</h3>
-            <p className="text-xs text-slate-400 mt-1">
-              All deadlines are either completed or scheduled for later cycles.
+          <div className="p-12 rounded-2xl bg-white border border-[#E2E8F0] text-center max-w-md mx-auto my-8 shadow-sm">
+            <Clock className="h-10 w-10 text-[#64748B] mx-auto mb-3" />
+            <h3 className="text-base font-semibold text-[#0F172A]">No deadlines in this view</h3>
+            <p className="text-xs text-[#64748B] mt-1">
+              All deadlines are either completed or scheduled for later recruitment cycles.
             </p>
           </div>
         ) : (
@@ -193,16 +197,16 @@ export default function DeadlinesPage() {
             return (
               <div
                 key={item.id}
-                className="p-5 rounded-2xl bg-[#111827] border border-slate-800 hover:border-slate-700 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg"
+                className="p-5 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#2563EB]/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm"
               >
                 <div className="flex items-start gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-gradient-to-tr from-[#4F7CFF]/20 to-[#35D5F2]/20 border border-blue-500/20 text-[#4F7CFF] flex items-center justify-center font-bold text-sm shrink-0">
+                  <div className="h-12 w-12 rounded-xl bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center font-bold text-sm shrink-0">
                     {item.company.slice(0, 2).toUpperCase()}
                   </div>
 
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-bold text-[#4F7CFF]">
+                      <span className="text-xs font-bold text-[#2563EB]">
                         {item.company}
                       </span>
                       {statusStyle && (
@@ -216,15 +220,15 @@ export default function DeadlinesPage() {
 
                     <Link
                       href={`/internships/${item.id}`}
-                      className="text-base font-bold text-white hover:text-[#4F7CFF] transition-colors block mt-0.5"
+                      className="text-base font-bold text-[#0F172A] hover:text-[#2563EB] transition-colors block mt-0.5"
                     >
                       {item.role}
                     </Link>
 
-                    <div className="flex items-center gap-3 text-xs text-slate-400 mt-1 flex-wrap">
+                    <div className="flex items-center gap-3 text-xs text-[#64748B] mt-1 flex-wrap">
                       <span>{item.location}</span>
                       <span>·</span>
-                      <span className="text-emerald-400">{item.stipend || "Competitive"}</span>
+                      <span className="text-[#16A34A] font-medium">{item.stipend || "Competitive"}</span>
                     </div>
                   </div>
                 </div>
@@ -232,7 +236,7 @@ export default function DeadlinesPage() {
                 {/* Right timing countdown & actions */}
                 <div className="flex items-center gap-3 self-end sm:self-center shrink-0">
                   <div className="text-right">
-                    <span className="text-xs font-semibold text-white block">
+                    <span className="text-xs font-semibold text-[#0F172A] block">
                       {formatDate(item.deadline)}
                     </span>
                     <Badge variant={urgencyBadge} className="mt-0.5">
@@ -251,7 +255,7 @@ export default function DeadlinesPage() {
                       item.role
                     )}&company=${encodeURIComponent(item.company)}`}
                   >
-                    <Button size="sm" className="glow-blue">
+                    <Button size="sm" className="shadow-sm">
                       <span>Match Resume</span>
                     </Button>
                   </Link>

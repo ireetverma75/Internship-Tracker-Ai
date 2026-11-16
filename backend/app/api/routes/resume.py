@@ -1,7 +1,7 @@
 import os
 import uuid
 from datetime import datetime
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status
+from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -109,6 +109,148 @@ async def upload_resume(
         "parse_status": "parsed",
         "extracted_profile": extracted.model_dump(),
         "message": "Resume parsed successfully"
+    }
+
+@router.get("/me")
+@router.get("/latest")
+async def get_my_resume(
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Retrieve the current user's active resume and parsed profile."""
+    stmt = select(Resume).where(Resume.user_id == user_id).order_by(Resume.uploaded_at.desc())
+    res = await db.execute(stmt)
+    resume = res.scalar_one_or_none()
+
+    p_stmt = select(Profile).where(Profile.user_id == user_id)
+    p_res = await db.execute(p_stmt)
+    profile = p_res.scalar_one_or_none()
+
+    if not resume:
+        return {
+            "has_resume": False,
+            "resume": None,
+            "skills": profile.skills if profile else []
+        }
+
+    return {
+        "has_resume": True,
+        "resume": {
+            "id": resume.id,
+            "user_id": resume.user_id,
+            "filename": resume.filename,
+            "file_size_bytes": resume.file_size_bytes,
+            "parse_status": resume.parse_status,
+            "uploaded_at": resume.uploaded_at.isoformat() if resume.uploaded_at else None,
+            "parsed_at": resume.parsed_at.isoformat() if resume.parsed_at else None,
+        },
+        "skills": profile.skills if profile else []
+    }
+
+@router.get("/{resume_id}")
+async def get_resume_by_id(
+    resume_id: str,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Retrieve resume metadata by resume ID."""
+    if resume_id in ["me", "latest"]:
+        return await get_my_resume(user_id=user_id, db=db)
+
+    stmt = select(Resume).where(Resume.id == resume_id)
+    res = await db.execute(stmt)
+    resume = res.scalar_one_or_none()
+
+    if not resume:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Resume with ID '{resume_id}' not found."
+        )
+
+    # Authorization check
+    if resume.user_id != user_id and user_id != DEMO_USER_ID:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not authorized to view this resume."
+        )
+
+    return {
+        "id": resume.id,
+        "user_id": resume.user_id,
+        "filename": resume.filename,
+        "file_size_bytes": resume.file_size_bytes,
+        "parse_status": resume.parse_status,
+        "uploaded_at": resume.uploaded_at.isoformat() if resume.uploaded_at else None,
+        "parsed_at": resume.parsed_at.isoformat() if resume.parsed_at else None,
+    }
+
+@router.post("/analyze")
+async def analyze_resume_endpoint(
+    file: Optional[UploadFile] = File(None),
+    resume_text: Optional[str] = Form(None)
+):
+    """Analyze a resume (file or raw text) and return structured ATS analysis with quality metrics."""
+    raw_text = ""
+    filename = "resume.pdf"
+
+    if file:
+        content = await file.read()
+        filename = file.filename or "resume.pdf"
+        try:
+            raw_text = validate_and_extract_text(content, filename)
+            extracted = parse_resume(content, filename)
+        except ResumeParseError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.message)
+    elif resume_text and resume_text.strip():
+        raw_text = resume_text.strip()
+        from app.services.resume_parser import _extract_profile
+        extracted = _extract_profile(raw_text)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either a PDF resume file or 'resume_text' must be provided."
+        )
+
+    words = raw_text.split()
+    skills = extracted.skills or []
+    text_lower = raw_text.lower()
+
+    action_verbs = ["spearheaded", "developed", "architected", "engineered", "implemented", "reduced", "optimized", "built", "designed", "deployed"]
+    detected_verbs = [v for v in action_verbs if v in text_lower]
+    impact_score = min(100, 50 + len(detected_verbs) * 10)
+    skill_score = min(100, round((len(skills) / 12) * 100))
+    structure_score = 90 if "education" in text_lower and ("experience" in text_lower or "project" in text_lower) else 70
+    conciseness_score = 95 if 250 <= len(words) <= 650 else (60 if len(words) < 250 else 75)
+    overall_quality = round(impact_score * 0.3 + skill_score * 0.3 + structure_score * 0.2 + conciseness_score * 0.2)
+
+    suggestions = []
+    if len(skills) < 8:
+        suggestions.append("Incorporate specific technical stack keywords (e.g. Docker, SQL, TypeScript) to pass ATS screening.")
+    if len(detected_verbs) < 3:
+        suggestions.append("Begin bullet points with high-impact action verbs (e.g., 'Engineered', 'Architected', 'Accelerated').")
+    if not any(char in text_lower for char in ["%", "$", "reduced", "increased"]):
+        suggestions.append("Quantify project outcomes with numerical metrics (e.g. 'boosted performance by 28%').")
+    if len(words) > 700:
+        suggestions.append("Resume length is slightly verbose. Consider condensing to a high-impact single page.")
+    if not suggestions:
+        suggestions.append("Resume demonstrates strong technical depth, clear visual sections, and action-oriented achievements.")
+
+    return {
+        "filename": filename,
+        "page_count": 1,
+        "char_count": len(raw_text),
+        "word_count": len(words),
+        "extracted_text": raw_text,
+        "detected_skills": skills,
+        "quality_score": overall_quality,
+        "quality_breakdown": {
+            "impact": impact_score,
+            "skills_density": skill_score,
+            "structure": structure_score,
+            "conciseness": conciseness_score
+        },
+        "extracted_profile": extracted.model_dump(),
+        "suggestions": suggestions
     }
 
 @router.post("/parse")

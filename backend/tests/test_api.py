@@ -134,3 +134,70 @@ async def test_resume_upload_valid_pdf(client):
     assert "extracted_profile" in data
     skills = data["extracted_profile"]["skills"]
     assert "Python" in skills or "React" in skills
+
+@pytest.mark.asyncio
+async def test_dashboard_stats(client):
+    res = await client.get("/api/dashboard/stats")
+    assert res.status_code == 200
+    data = res.json()
+    assert "savedInternshipsCount" in data
+    assert "statusCounts" in data
+    assert "averageMatchScore" in data
+
+@pytest.mark.asyncio
+async def test_resume_endpoints(client):
+    # Test resume me
+    res = await client.get("/api/resume/me")
+    assert res.status_code == 200
+    data = res.json()
+    assert "has_resume" in data
+
+    # Test resume analyze
+    doc = fitz.open()
+    page = doc.new_page()
+    page.insert_text((50, 72), "Alex Chen\nEducation: B.Tech Computer Science\nSkills: Python, TypeScript, React, Docker\nExperience: Engineered high performance microservices.")
+    pdf_bytes = doc.tobytes()
+    doc.close()
+
+    res_analyze = await client.post("/api/resume/analyze", files={"file": ("resume.pdf", pdf_bytes, "application/pdf")})
+    assert res_analyze.status_code == 200
+    data_analyze = res_analyze.json()
+    assert "quality_score" in data_analyze
+    assert "detected_skills" in data_analyze
+    assert "quality_breakdown" in data_analyze
+
+@pytest.mark.asyncio
+async def test_skills_gap_analysis(client):
+    res = await client.get("/api/skills/gap-analysis?role=swe-intern&skills=Python,React,SQL")
+    assert res.status_code == 200
+    data = res.json()
+    assert "target_skills" in data
+    assert "matched_skills" in data
+    assert "missing_skills" in data
+    assert "match_percentage" in data
+
+@pytest.mark.asyncio
+async def test_jobs_search_and_save(client):
+    # Search
+    res_search = await client.get("/api/jobs/search?limit=5")
+    assert res_search.status_code == 200
+    jobs_data = res_search.json()
+    assert "jobs" in jobs_data
+    if jobs_data["jobs"]:
+        job_id = jobs_data["jobs"][0]["id"]
+        # Save job
+        save_res = await client.post(f"/api/jobs/{job_id}/save")
+        assert save_res.status_code == 200
+        assert save_res.json()["is_saved"] is True
+
+        # Unsave job
+        unsave_res = await client.delete(f"/api/jobs/save/{job_id}")
+        assert unsave_res.status_code == 200
+        assert unsave_res.json()["is_saved"] is False
+
+@pytest.mark.asyncio
+async def test_matching_recommendations_alias(client):
+    res = await client.get("/api/matching/recommendations?top_n=3")
+    assert res.status_code == 200
+    data = res.json()
+    assert "recommendations" in data

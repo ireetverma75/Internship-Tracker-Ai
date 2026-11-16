@@ -67,18 +67,18 @@ export default function ProfilePage() {
   return (
     <AppShell>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E2E8F0]">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-            <User className="h-7 w-7 text-[#4F7CFF]" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight flex items-center gap-2.5">
+            <User className="h-7 w-7 text-[#2563EB]" />
             <span>Student Career Profile</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1">
             Personalize your target internships, degree milestones, and core skill stack.
           </p>
         </div>
 
-        <Button onClick={handleSave} className="glow-blue self-start sm:self-auto">
+        <Button onClick={handleSave} className="self-start sm:self-auto shadow-sm">
           <Save className="h-4 w-4 mr-1.5" />
           <span>Save Changes</span>
         </Button>
@@ -87,27 +87,27 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
         {/* Left Column: Avatar & Summary Card */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="p-6 rounded-3xl bg-[#111827] border border-slate-800 text-center shadow-xl space-y-4">
-            <div className="h-24 w-24 rounded-full bg-gradient-to-tr from-[#4F7CFF] via-[#35D5F2] to-blue-400 mx-auto flex items-center justify-center font-extrabold text-3xl text-white shadow-2xl shadow-[#4F7CFF]/30 ring-4 ring-[#111827]">
+          <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] text-center shadow-sm space-y-4">
+            <div className="h-20 w-20 rounded-full bg-gradient-to-tr from-[#2563EB] to-[#38BDF8] mx-auto flex items-center justify-center font-extrabold text-2xl text-white shadow-sm ring-4 ring-slate-100">
               {fullName ? fullName.split(" ").map((n) => n[0]).join("") : "AC"}
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-white">{fullName || "Student Name"}</h3>
-              <p className="text-xs text-[#35D5F2] font-medium mt-0.5">{degree}</p>
-              <p className="text-xs text-slate-400 mt-0.5">{university}</p>
+              <h3 className="text-base font-bold text-[#0F172A]">{fullName || "Student Name"}</h3>
+              <p className="text-xs text-[#2563EB] font-medium mt-0.5">{degree}</p>
+              <p className="text-xs text-[#64748B] mt-0.5">{university}</p>
               <Badge variant="primary" className="mt-2.5">
                 Class of {graduationYear}
               </Badge>
             </div>
 
-            <div className="pt-4 border-t border-slate-800/80 text-left space-y-2 text-xs text-slate-400">
+            <div className="pt-4 border-t border-[#E2E8F0] text-left space-y-2 text-xs text-[#64748B]">
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-slate-500" />
+                <MapPin className="h-4 w-4 text-[#64748B]" />
                 <span>Preferred: {preferredLocations || "Flexible"}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Briefcase className="h-4 w-4 text-slate-500" />
+                <Briefcase className="h-4 w-4 text-[#64748B]" />
                 <span>Work Mode: {preferredWorkModes.join(", ") || "Any"}</span>
               </div>
             </div>
@@ -116,59 +116,63 @@ export default function ProfilePage() {
 
         {/* Right Column: Editable Profile Details */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="p-6 md:p-8 rounded-3xl bg-[#111827] border border-slate-800 shadow-xl space-y-6">
-            <h3 className="text-base font-bold text-white border-b border-slate-800 pb-3">
+          <div className="p-6 md:p-8 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm space-y-6">
+            <h3 className="text-sm font-bold text-[#0F172A] uppercase tracking-wider border-b border-[#E2E8F0] pb-3">
               Academic & Personal Credentials
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#0F172A] mb-1.5">
                   Full Name
                 </label>
                 <Input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="e.g. Alex Chen"
+                  placeholder="e.g. Student User"
+                  className="bg-[#F8FAFC]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#0F172A] mb-1.5">
                   Student Email
                 </label>
                 <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="alex.chen@university.edu"
+                  placeholder="student@university.edu"
+                  className="bg-[#F8FAFC]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#0F172A] mb-1.5">
                   University / College
                 </label>
                 <Input
                   value={university}
                   onChange={(e) => setUniversity(e.target.value)}
                   placeholder="University of Washington"
+                  className="bg-[#F8FAFC]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#0F172A] mb-1.5">
                   Degree & Major
                 </label>
                 <Input
                   value={degree}
                   onChange={(e) => setDegree(e.target.value)}
                   placeholder="B.S. in Computer Science"
+                  className="bg-[#F8FAFC]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#0F172A] mb-1.5">
                   Expected Graduation Year
                 </label>
                 <Input
@@ -176,13 +180,14 @@ export default function ProfilePage() {
                   value={graduationYear}
                   onChange={(e) => setGraduationYear(Number(e.target.value))}
                   placeholder="2027"
+                  className="bg-[#F8FAFC]"
                 />
               </div>
             </div>
 
             {/* Technical Skills Interactive Tag Editor */}
-            <div className="pt-4 border-t border-slate-800">
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <div className="pt-4 border-t border-[#E2E8F0]">
+              <label className="block text-xs font-semibold text-[#0F172A] mb-1.5">
                 Technical Skills Stack
               </label>
               <div className="flex gap-2 mb-3">
@@ -191,24 +196,24 @@ export default function ProfilePage() {
                   onChange={(e) => setNewSkill(e.target.value)}
                   onKeyDown={handleAddSkill}
                   placeholder="Type a skill (e.g. PyTorch, Docker, Next.js) and press Enter"
-                  className="text-xs"
+                  className="text-xs bg-[#F8FAFC]"
                 />
                 <Button type="button" size="sm" onClick={handleAddSkill}>
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {skills.map((skill) => (
                   <span
                     key={skill}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/15 text-[#4F7CFF] border border-blue-500/30"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-blue-50 text-[#2563EB] border border-blue-200"
                   >
                     <span>{skill}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveSkill(skill)}
-                      className="hover:text-white"
+                      className="hover:text-[#DC2626]"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -218,35 +223,37 @@ export default function ProfilePage() {
             </div>
 
             {/* Target Role Preferences */}
-            <div className="pt-4 border-t border-slate-800 space-y-4">
-              <h3 className="text-base font-bold text-white">
+            <div className="pt-4 border-t border-[#E2E8F0] space-y-4">
+              <h3 className="text-sm font-bold text-[#0F172A] uppercase tracking-wider">
                 Internship Search Preferences
               </h3>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#0F172A] mb-1.5">
                   Preferred Internship Roles (comma separated)
                 </label>
                 <Input
                   value={preferredRoles}
                   onChange={(e) => setPreferredRoles(e.target.value)}
                   placeholder="Software Engineering Intern, Machine Learning Intern"
+                  className="bg-[#F8FAFC]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#0F172A] mb-1.5">
                   Preferred Target Locations (comma separated)
                 </label>
                 <Input
                   value={preferredLocations}
                   onChange={(e) => setPreferredLocations(e.target.value)}
                   placeholder="Seattle, WA, San Francisco, CA, Remote"
+                  className="bg-[#F8FAFC]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-2">
+                <label className="block text-xs font-semibold text-[#0F172A] mb-2">
                   Work Mode Preference
                 </label>
                 <div className="flex gap-2">
@@ -255,10 +262,10 @@ export default function ProfilePage() {
                       key={mode}
                       type="button"
                       onClick={() => handleToggleWorkMode(mode)}
-                      className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                      className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                         preferredWorkModes.includes(mode)
-                          ? "bg-[#4F7CFF] text-white border-[#4F7CFF]"
-                          : "bg-slate-900 border-slate-800 text-slate-400 hover:text-white"
+                          ? "bg-[#2563EB] text-white border-[#2563EB] shadow-sm"
+                          : "bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A]"
                       }`}
                     >
                       {mode}

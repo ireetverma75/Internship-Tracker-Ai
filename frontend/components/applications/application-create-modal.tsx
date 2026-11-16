@@ -81,7 +81,7 @@ export const ApplicationCreateModal: React.FC<ApplicationCreateModalProps> = ({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-[#0F172A] mb-1">
             Company Name *
           </label>
           <Input
@@ -89,11 +89,12 @@ export const ApplicationCreateModal: React.FC<ApplicationCreateModalProps> = ({
             onChange={(e) => setCompany(e.target.value)}
             placeholder="e.g. Anthropic, OpenAI, Apple"
             error={errors.company}
+            className="bg-[#F8FAFC]"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-[#0F172A] mb-1">
             Role Title *
           </label>
           <Input
@@ -101,17 +102,18 @@ export const ApplicationCreateModal: React.FC<ApplicationCreateModalProps> = ({
             onChange={(e) => setRole(e.target.value)}
             placeholder="e.g. Software Engineering Intern"
             error={errors.role}
+            className="bg-[#F8FAFC]"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-[#0F172A] mb-1">
             Initial Status Stage
           </label>
           <select
             value={status}
             onChange={(e: any) => setStatus(e.target.value)}
-            className="flex h-10 w-full rounded-lg border border-slate-700/80 bg-[#111827] px-3 text-sm text-[#F8FAFC] focus:outline-none focus:border-[#4F7CFF]"
+            className="flex h-10 w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 text-xs text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
           >
             <option value="Saved">Saved</option>
             <option value="Applied">Applied</option>
@@ -124,40 +126,43 @@ export const ApplicationCreateModal: React.FC<ApplicationCreateModalProps> = ({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-[#0F172A] mb-1">
               Applied Date
             </label>
             <Input
               type="date"
               value={appliedDate}
               onChange={(e) => setAppliedDate(e.target.value)}
+              className="text-xs bg-[#F8FAFC]"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-[#0F172A] mb-1">
               Deadline
             </label>
             <Input
               type="date"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
+              className="text-xs bg-[#F8FAFC]"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-[#0F172A] mb-1">
             Next Action / Step
           </label>
           <Input
             value={nextAction}
             onChange={(e) => setNextAction(e.target.value)}
             placeholder="e.g. Awaiting recruiter email, prepare behavioral questions"
+            className="text-xs bg-[#F8FAFC]"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-[#0F172A] mb-1">
             Notes
           </label>
           <Textarea
@@ -165,14 +170,15 @@ export const ApplicationCreateModal: React.FC<ApplicationCreateModalProps> = ({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Referrals, recruiter names, links..."
+            className="text-xs bg-[#F8FAFC]"
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
-          <Button type="button" variant="outline" onClick={onClose}>
+        <div className="flex justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
+          <Button type="button" variant="outline" size="sm" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" isLoading={isSubmitting}>
+          <Button type="submit" size="sm" isLoading={isSubmitting}>
             Track Application
           </Button>
         </div>
