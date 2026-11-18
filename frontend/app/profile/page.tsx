@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { StudentProfile } from "@/types";
 import { store } from "@/lib/storage";
+import { api } from "@/lib/api";
 import { toast } from "sonner";
 
 export default function ProfilePage() {
@@ -22,6 +23,21 @@ export default function ProfilePage() {
   const [preferredRoles, setPreferredRoles] = useState(profile.preferred_roles.join(", "));
   const [preferredLocations, setPreferredLocations] = useState(profile.preferred_locations.join(", "));
   const [preferredWorkModes, setPreferredWorkModes] = useState<string[]>(profile.preferred_work_modes);
+
+  useEffect(() => {
+    api.getProfile().then((remote) => {
+      if (remote) {
+        if (remote.full_name) setFullName(remote.full_name);
+        if (remote.university) setUniversity(remote.university);
+        if (remote.degree) setDegree(remote.degree);
+        if (remote.graduation_year) setGraduationYear(remote.graduation_year);
+        if (remote.skills && remote.skills.length > 0) setSkills(remote.skills);
+        if (remote.preferred_roles && remote.preferred_roles.length > 0) setPreferredRoles(remote.preferred_roles.join(", "));
+        if (remote.preferred_locations && remote.preferred_locations.length > 0) setPreferredLocations(remote.preferred_locations.join(", "));
+        if (remote.preferred_work_modes && remote.preferred_work_modes.length > 0) setPreferredWorkModes(remote.preferred_work_modes);
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleAddSkill = (e: React.KeyboardEvent | React.MouseEvent) => {
     if ("key" in e && e.key !== "Enter") return;

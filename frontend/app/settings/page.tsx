@@ -23,6 +23,7 @@ import { toast } from "sonner";
 export default function SettingsPage() {
   const router = useRouter();
   const [isBackendOnline, setIsBackendOnline] = useState<boolean>(false);
+  const [isCheckingBackend, setIsCheckingBackend] = useState<boolean>(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
   useEffect(() => {
@@ -33,6 +34,23 @@ export default function SettingsPage() {
     window.addEventListener(NOTIFY_CHANGE_EVENT, handleSync);
     return () => window.removeEventListener(NOTIFY_CHANGE_EVENT, handleSync);
   }, []);
+
+  const handleTestBackendConnection = async () => {
+    setIsCheckingBackend(true);
+    try {
+      const online = await store.checkBackendStatus();
+      setIsBackendOnline(online);
+      if (online) {
+        toast.success("FastAPI backend is healthy and responding!");
+      } else {
+        toast.warning("Backend is unreachable. Using offline client-side fallback.");
+      }
+    } catch {
+      toast.error("Error pinging backend");
+    } finally {
+      setIsCheckingBackend(false);
+    }
+  };
 
   const handleExportData = async () => {
     try {
@@ -82,9 +100,20 @@ export default function SettingsPage() {
               <Server className="h-4 w-4 text-[#2563EB]" />
               <span>Backend & Database Infrastructure</span>
             </h3>
-            <Badge variant={isBackendOnline ? "success" : "warning"}>
-              {isBackendOnline ? "FastAPI Connected" : "Local Demo Mode"}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleTestBackendConnection}
+                disabled={isCheckingBackend}
+                className="h-7 text-xs px-2 text-[#2563EB]"
+              >
+                {isCheckingBackend ? "Testing..." : "Test Connection"}
+              </Button>
+              <Badge variant={isBackendOnline ? "success" : "warning"}>
+                {isBackendOnline ? "FastAPI Connected" : "Local Demo Mode"}
+              </Badge>
+            </div>
           </div>
 
           <div className="space-y-2.5 text-xs text-[#0F172A]">

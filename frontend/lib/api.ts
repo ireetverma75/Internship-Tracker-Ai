@@ -17,7 +17,7 @@ import { INITIAL_PROFILE } from "@/lib/demo-data";
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "http://localhost:8000";
+  (process.env.VERCEL ? "" : "http://localhost:8000");
 
 const DEFAULT_TIMEOUT_MS = 10000;
 
@@ -65,6 +65,10 @@ export class ApiClient {
     options: RequestInit = {},
     timeoutMs: number = DEFAULT_TIMEOUT_MS
   ): Promise<T> {
+    if (!this.baseUrl) {
+      throw new Error("Backend API is not configured for this deployment. Local demo data remains available.");
+    }
+
     const url = `${this.baseUrl}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);

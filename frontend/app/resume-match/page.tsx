@@ -19,7 +19,9 @@ import {
   GraduationCap,
   ArrowRight,
   Send,
-  BarChart3
+  BarChart3,
+  Compass,
+  Plus
 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
@@ -80,6 +82,10 @@ function ResumeMatchContent() {
     } finally {
       setIsLoadingRecs(false);
     }
+  };
+
+  const handleFindMissingSkills = () => {
+    router.push(`/skill-gap?role=${encodeURIComponent(targetRole)}`);
   };
 
   const handleTrackTargetRole = async () => {
@@ -601,6 +607,89 @@ function ResumeMatchContent() {
                         </div>
                       </div>
                     )}
+
+                    {/* Integrated Action Controls */}
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                      <h4 className="text-xs font-bold text-[#0F172A] uppercase tracking-wider">
+                        Next Recommended Actions
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          onClick={handleFindMissingSkills}
+                          variant="secondary"
+                          size="sm"
+                          className="text-xs"
+                        >
+                          <Compass className="h-3.5 w-3.5 mr-1 text-[#2563EB]" />
+                          <span>Find Missing Skills Analysis</span>
+                        </Button>
+                        <Button
+                          onClick={handleGetRecommendations}
+                          variant="secondary"
+                          size="sm"
+                          disabled={isLoadingRecs}
+                          className="text-xs"
+                        >
+                          <Sparkles className="h-3.5 w-3.5 mr-1 text-amber-500" />
+                          <span>{isLoadingRecs ? "Fetching..." : "Get AI Recommendations"}</span>
+                        </Button>
+                        <Button
+                          onClick={handleTrackTargetRole}
+                          size="sm"
+                          className="text-xs bg-[#2563EB] hover:bg-[#1D4ED8] text-white"
+                        >
+                          <Plus className="h-3.5 w-3.5 mr-1" />
+                          <span>Track Application in Pipeline</span>
+                        </Button>
+                      </div>
+
+                      {recommendations.length > 0 && (
+                        <div className="pt-3 border-t border-slate-200 space-y-2">
+                          <p className="text-xs font-bold text-[#0F172A]">
+                            Tailored Opportunities ({recommendations.length}):
+                          </p>
+                          <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                            {recommendations.map((rec: any, idx: number) => (
+                              <div
+                                key={idx}
+                                className="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 text-xs"
+                              >
+                                <div>
+                                  <span className="font-semibold text-[#0F172A]">
+                                    {rec.role || rec.title}
+                                  </span>
+                                  <span className="text-[#64748B] ml-1.5">
+                                    at {rec.company}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {rec.match_score && (
+                                    <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-[#2563EB]">
+                                      {rec.match_score}% match
+                                    </span>
+                                  )}
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-6 text-[11px] px-2"
+                                    onClick={() => {
+                                      setTargetRole(rec.role || rec.title || targetRole);
+                                      setTargetCompany(rec.company || targetCompany);
+                                      if (rec.required_skills) {
+                                        setRequiredSkills(Array.isArray(rec.required_skills) ? rec.required_skills.join(", ") : rec.required_skills);
+                                      }
+                                      toast.info(`Loaded ${rec.company} requirement`);
+                                    }}
+                                  >
+                                    Select
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Scoring Methodology & Privacy Disclaimer */}
                     <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[11px] text-[#64748B] space-y-1">
