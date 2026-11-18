@@ -8,6 +8,8 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
 [![PyMuPDF](https://img.shields.io/badge/PyMuPDF-fitz-red.svg)](https://pymupdf.readthedocs.io)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E.svg?logo=supabase&logoColor=white)](https://supabase.com)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ireetverma75/Internship-Tracker-Ai)
+[![Vercel Production](https://img.shields.io/badge/Vercel-Live_App-black.svg?logo=vercel&logoColor=white)](https://internship-tracker-ai-six.vercel.app)
 
 ---
 
