@@ -11,4 +11,4 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: CORS_ORIGINS
-        value: http://localhost:3000
+        value: http://localhost:3000,https://internship-tracker-ai-six.vercel.app,https://internship-tracker-ai.vercel.app
