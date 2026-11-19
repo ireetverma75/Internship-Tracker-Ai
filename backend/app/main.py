@@ -1,6 +1,7 @@
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, status, Depends
+from typing import Optional
+from fastapi import FastAPI, Request, status, Depends, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -112,6 +113,26 @@ async def matching_recommendations_alias(
         top_n=top_n,
         include_synthetic=include_synthetic,
         user_id=user_id,
+        db=db
+    )
+
+@app.post("/api/matching/recommendations")
+async def matching_recommendations_post_alias(
+    request: Request,
+    file: Optional[UploadFile] = File(None),
+    resume_text: Optional[str] = Form(None),
+    top_n: int = Form(10),
+    job_type: Optional[str] = Form(None),
+    include_synthetic: bool = Form(False),
+    db: AsyncSessionLocal = Depends(recommendations.get_db)
+):
+    return await recommendations.get_job_recommendations_from_resume(
+        request=request,
+        file=file,
+        resume_text=resume_text,
+        top_n=top_n,
+        job_type=job_type,
+        include_synthetic=include_synthetic,
         db=db
     )
 

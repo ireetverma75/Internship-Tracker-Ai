@@ -1,7 +1,7 @@
 import os
 import uuid
 from datetime import datetime
-from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, status
+from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -186,12 +186,21 @@ async def get_resume_by_id(
 
 @router.post("/analyze")
 async def analyze_resume_endpoint(
+    request: Request,
     file: Optional[UploadFile] = File(None),
     resume_text: Optional[str] = Form(None)
 ):
     """Analyze a resume (file or raw text) and return structured ATS analysis with quality metrics."""
     raw_text = ""
     filename = "resume.pdf"
+
+    content_type = request.headers.get("content-type", "")
+    if "application/json" in content_type:
+        try:
+            body = await request.json()
+            resume_text = body.get("resume_text", resume_text)
+        except Exception:
+            pass
 
     if file:
         content = await file.read()

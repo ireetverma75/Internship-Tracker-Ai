@@ -3,7 +3,7 @@ Resume Matching API Router.
 Calculates actual TF-IDF Cosine Similarity, Skill Gap, and Recommendations.
 """
 from typing import Optional, List
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Body, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Body, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -176,6 +176,7 @@ async def batch_match_resume(
 
 @router.post("/analyze")
 async def analyze_matching_endpoint(
+    request: Request,
     job_id: Optional[str] = Form(None),
     job_description: Optional[str] = Form(None),
     job_title: Optional[str] = Form("Target Position"),
@@ -187,6 +188,20 @@ async def analyze_matching_endpoint(
     db: AsyncSession = Depends(get_db)
 ):
     """General matching analysis endpoint supporting job_id or freeform job description."""
+    content_type = request.headers.get("content-type", "")
+    if "application/json" in content_type:
+        try:
+            body = await request.json()
+            job_id = body.get("job_id", job_id)
+            job_description = body.get("job_description", job_description)
+            job_title = body.get("job_title", job_title or "Target Position")
+            company = body.get("company", company or "Target Company")
+            required_skills = body.get("required_skills", required_skills)
+            preferred_skills = body.get("preferred_skills", preferred_skills)
+            resume_text = body.get("resume_text", resume_text)
+        except Exception:
+            pass
+
     if job_id:
         return await match_resume_with_job(job_id=job_id, file=file, resume_text=resume_text, db=db)
 

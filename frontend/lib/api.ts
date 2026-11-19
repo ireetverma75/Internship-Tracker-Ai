@@ -14,19 +14,42 @@ import {
 } from "@/types";
 import { INITIAL_PROFILE } from "@/lib/demo-data";
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  (process.env.VERCEL ? "" : "http://localhost:8000");
+export function resolveBackendUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.trim()) {
+    return process.env.NEXT_PUBLIC_API_URL.trim().replace(/\/$/, "");
+  }
+  if (process.env.NEXT_PUBLIC_BACKEND_URL && process.env.NEXT_PUBLIC_BACKEND_URL.trim()) {
+    return process.env.NEXT_PUBLIC_BACKEND_URL.trim().replace(/\/$/, "");
+  }
 
-const DEFAULT_TIMEOUT_MS = 10000;
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host && !host.includes("localhost") && !host.includes("127.0.0.1")) {
+      return "https://internship-tracker-api-7i93.onrender.com";
+    }
+    return "http://localhost:8000";
+  }
+
+  return "https://internship-tracker-api-7i93.onrender.com";
+}
+
+const BACKEND_URL = resolveBackendUrl();
+
+const DEFAULT_TIMEOUT_MS = 35000;
 
 export class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
 
-  constructor(baseUrl: string = BACKEND_URL) {
-    this.baseUrl = baseUrl.replace(/\/$/, "");
+  constructor(baseUrl?: string) {
+    this.baseUrl = (baseUrl || resolveBackendUrl()).replace(/\/$/, "");
+  }
+
+  public getBaseUrl(): string {
+    if (!this.baseUrl || this.baseUrl === "") {
+      this.baseUrl = resolveBackendUrl();
+    }
+    return this.baseUrl;
   }
 
   setToken(token: string | null): void {
@@ -65,11 +88,12 @@ export class ApiClient {
     options: RequestInit = {},
     timeoutMs: number = DEFAULT_TIMEOUT_MS
   ): Promise<T> {
-    if (!this.baseUrl) {
+    const activeBaseUrl = this.getBaseUrl();
+    if (!activeBaseUrl) {
       throw new Error("Backend API is not configured for this deployment. Local demo data remains available.");
     }
 
-    const url = `${this.baseUrl}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
+    const url = `${activeBaseUrl}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 

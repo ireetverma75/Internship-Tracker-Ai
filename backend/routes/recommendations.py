@@ -3,7 +3,7 @@ Recommendations API Router.
 Recommends jobs from the Hugging Face dataset based on candidate resume credentials.
 """
 from typing import Optional, List
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -21,6 +21,7 @@ router = APIRouter(prefix="/api/recommendations", tags=["Recommendations"])
 
 @router.post("/jobs", response_model=RecommendationResponse)
 async def get_job_recommendations_from_resume(
+    request: Request,
     file: Optional[UploadFile] = File(None),
     resume_text: Optional[str] = Form(None),
     top_n: int = Form(10),
@@ -32,6 +33,16 @@ async def get_job_recommendations_from_resume(
     Generate personalized job recommendations from the Hugging Face dataset
     for an uploaded candidate resume.
     """
+    content_type = request.headers.get("content-type", "")
+    if "application/json" in content_type:
+        try:
+            body = await request.json()
+            resume_text = body.get("resume_text", resume_text)
+            top_n = body.get("top_n", top_n)
+            job_type = body.get("job_type", job_type)
+            include_synthetic = body.get("include_synthetic", include_synthetic)
+        except Exception:
+            pass
     text_to_analyze = ""
     if file:
         file_bytes = await file.read()
